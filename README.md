@@ -1,8 +1,6 @@
 # Android Emoji Keyboard
 A library to provide an emoji-keyboard implementation for Android applications
 
-[ ![Download](https://api.bintray.com/packages/edsilfer/maven/emoji-library/images/download.svg) ](https://bintray.com/edsilfer/maven/emoji-library/_latestVersion)
-
 <a name="showcase" />
 
 # Showcase
@@ -15,7 +13,7 @@ A library to provide an emoji-keyboard implementation for Android applications
 # Quicky Setup
 ```
 dependencies {
-    compile 'br.com.instachat:emoji-library:1.0.10'
+    compile 'ru.funnyhourse:emoji-library:1.0.0'
 }
 ```
 Refer to the [wiki](https://github.com/instachat/emoji-library/wiki/Development) section.
@@ -33,10 +31,12 @@ Refer to the [wiki](https://github.com/instachat/emoji-library/wiki/Development)
 # Team Members
 * "Fernandes S. Edgar" <fernandes.s.edgar@gmail.com>
 * "Leonardo Assunção" <leo.assuncao92@gmail.com>
+* "Andrew Shalaev" <isqad88@gmail.com>
 
 <a name="license"></a>
 # License
 Copyright 2015 Edgar da Silva Fernandes | Leonardo Assunção
+Copyright 2019 Andrew Shalaev
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -43,7 +43,7 @@
                 android:stackFromBottom="false"
                 android:transcriptMode="normal"/>
 
-            <br.com.instachat.emojilibrary.model.layout.TelegramPanel
+            <ru.funnyhourse.emojilibrary.model.layout.TelegramPanel
                 android:id="@+id/bottompanel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

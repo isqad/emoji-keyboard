@@ -1,5 +1,5 @@
 <manifest
-    package="br.com.instachat.emojikeyboard"
+    package="ru.funnyhourse.emojikeyboard"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
@@ -20,7 +20,7 @@
             android:value="true"/>
         <meta-data
             android:name="DOMAIN_PACKAGE_NAME"
-            android:value="br.com.instachat.android"/>
+            android:value="ru.funnyhourse.android"/>
 
         <activity
             android:name=".controller.ActivityTelegram"
