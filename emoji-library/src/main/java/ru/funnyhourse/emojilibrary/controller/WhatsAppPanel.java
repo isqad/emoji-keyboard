@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.model.layout.EmojiCompatActivity;
 import ru.funnyhourse.emojilibrary.model.layout.EmojiEditText;
+import ru.funnyhourse.emojilibrary.model.layout.IOnBackPressedListener;
 import ru.funnyhourse.emojilibrary.model.layout.WhatsAppPanelEventListener;
 
 /**
@@ -115,7 +116,7 @@ public class WhatsAppPanel {
     }
 
     private void setOnBackPressed() {
-        this.mActivity.setOnBackPressed(new EmojiCompatActivity.OnBackPressedListener() {
+        this.mActivity.setOnBackPressed(new IOnBackPressedListener() {
             @Override
             public Boolean onBackPressed() {
                 if (WhatsAppPanel.this.isEmojiKeyboardVisible) {

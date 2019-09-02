@@ -1,5 +1,6 @@
 package ru.funnyhourse.emojilibrary.controller;
 
+import android.app.Activity;
 import android.os.Build;
 import android.os.Handler;
 import android.text.Editable;
@@ -9,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import java.util.concurrent.Executors;
@@ -16,8 +18,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import ru.funnyhourse.emojilibrary.R;
-import ru.funnyhourse.emojilibrary.model.layout.EmojiCompatActivity;
 import ru.funnyhourse.emojilibrary.model.layout.EmojiEditText;
+import ru.funnyhourse.emojilibrary.model.layout.IEmojiActivity;
+import ru.funnyhourse.emojilibrary.model.layout.IOnBackPressedListener;
 import ru.funnyhourse.emojilibrary.model.layout.TelegramPanelEventListener;
 
 /**
@@ -27,7 +30,7 @@ public class TelegramPanel {
 
     private static final String TAG = "TelegramPanel";
 
-    private EmojiCompatActivity mActivity;
+    private AppCompatActivity mActivity;
     private Toolbar mBottomPanel;
     private EmojiEditText mInput;
     private EmojiKeyboard mEmojiKeyboard;
@@ -35,21 +38,26 @@ public class TelegramPanel {
     private LinearLayout mCurtain;
     private Boolean mToogleIcon = Boolean.TRUE;
 
+    private View parentView;
+
     private Boolean isEmojiKeyboardVisible = Boolean.FALSE;
 
     // CONSTRUCTOR
-    public TelegramPanel(EmojiCompatActivity activity, TelegramPanelEventListener listener) {
+    public TelegramPanel(AppCompatActivity activity,
+                         View parentView,
+                         TelegramPanelEventListener listener) {
         this.mActivity = activity;
         this.initBottomPanel();
         this.setInputConfig();
         this.setOnBackPressed();
         this.mEmojiKeyboard = new EmojiKeyboard(this.mActivity, this.mInput);
         this.mListener = listener;
+        this.parentView = parentView;
     }
 
     // INITIALIZATION
     private void initBottomPanel() {
-        this.mBottomPanel = (Toolbar) this.mActivity.findViewById(R.id.panel);
+        this.mBottomPanel = (Toolbar) parentView.findViewById(R.id.panel);
         this.mBottomPanel.setNavigationIcon(R.drawable.input_emoji);
         this.mBottomPanel.setTitleTextColor(0xFFFFFFFF);
         this.mBottomPanel.inflateMenu(R.menu.telegram_menu);
@@ -93,7 +101,7 @@ public class TelegramPanel {
             }
         });
 
-        this.mCurtain = (LinearLayout) this.mActivity.findViewById(R.id.curtain);
+        this.mCurtain = (LinearLayout) this.parentView.findViewById(R.id.curtain);
     }
 
     private void setInputConfig() {
@@ -174,7 +182,7 @@ public class TelegramPanel {
     }
 
     private void setOnBackPressed() {
-        this.mActivity.setOnBackPressed(new EmojiCompatActivity.OnBackPressedListener() {
+        ((IEmojiActivity)this.mActivity).setOnBackPressed(new IOnBackPressedListener() {
             @Override
             public Boolean onBackPressed() {
                 if (TelegramPanel.this.isEmojiKeyboardVisible) {

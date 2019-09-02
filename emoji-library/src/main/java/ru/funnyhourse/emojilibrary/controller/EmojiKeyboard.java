@@ -1,7 +1,10 @@
 package ru.funnyhourse.emojilibrary.controller;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
+import android.app.Activity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +18,6 @@ import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.adapter.EmojiTabAdapter;
 import ru.funnyhourse.emojilibrary.model.Emoji;
 import ru.funnyhourse.emojilibrary.model.OnEmojiClickListener;
-import ru.funnyhourse.emojilibrary.model.layout.EmojiCompatActivity;
 import ru.funnyhourse.emojilibrary.model.layout.EmojiEditText;
 
 /**
@@ -24,7 +26,7 @@ import ru.funnyhourse.emojilibrary.model.layout.EmojiEditText;
 public class EmojiKeyboard implements OnEmojiClickListener {
     private static final String TAG = "EmojiKeyboard";
 
-    private EmojiCompatActivity mActivity;
+    private AppCompatActivity mActivity;
 
     private ImageView[] mTabIcons = new ImageView[6];
     private RelativeLayout mEmojiKeyboardLayout;
@@ -32,7 +34,7 @@ public class EmojiKeyboard implements OnEmojiClickListener {
     private ImageView mBackspace;
 
     // CONSTRUCTOR
-    public EmojiKeyboard(EmojiCompatActivity activity, EmojiEditText input) {
+    public EmojiKeyboard(AppCompatActivity activity, EmojiEditText input) {
         this.mInput = input;
         this.mActivity = activity;
         this.mEmojiKeyboardLayout = (RelativeLayout) mActivity.findViewById(R.id.emoji_keyboard);

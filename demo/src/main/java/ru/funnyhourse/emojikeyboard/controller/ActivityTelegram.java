@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -30,15 +31,19 @@ import ru.funnyhourse.emojikeyboard.model.MessageType;
 import ru.funnyhourse.emojikeyboard.util.TimestampUtil;
 import ru.funnyhourse.emojilibrary.controller.TelegramPanel;
 import ru.funnyhourse.emojilibrary.model.layout.EmojiCompatActivity;
+import ru.funnyhourse.emojilibrary.model.layout.IEmojiActivity;
+import ru.funnyhourse.emojilibrary.model.layout.IOnBackPressedListener;
 import ru.funnyhourse.emojilibrary.model.layout.TelegramPanelEventListener;
 
 
 /**
  * Created by edgar on 17/02/2016.
  */
-public class ActivityTelegram extends EmojiCompatActivity implements TelegramPanelEventListener {
+public class ActivityTelegram extends AppCompatActivity implements TelegramPanelEventListener, IEmojiActivity {
 
     public static final String TAG = "ActivityTelegram";
+
+    private IOnBackPressedListener mOnBackPressedListener;
 
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
@@ -57,7 +62,10 @@ public class ActivityTelegram extends EmojiCompatActivity implements TelegramPan
         this.initDrawerMenu();
         this.setTelegramTheme();
         this.initMessageList();
-        this.mBottomPanel = new TelegramPanel(this, this);
+
+        this.mBottomPanel = new TelegramPanel(this,
+                                              (View)findViewById(R.id.mainlayout),
+                                              this);
     }
 
     @Override
@@ -214,5 +222,20 @@ public class ActivityTelegram extends EmojiCompatActivity implements TelegramPan
         this.mAdapter.getDataset().add(message);
         this.mAdapter.notifyDataSetChanged();
         this.mMessages.scrollToPosition(this.mAdapter.getItemCount() - 1);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.mOnBackPressedListener != null) {
+            if (!this.mOnBackPressedListener.onBackPressed()) {
+                super.onBackPressed();
+            }
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    public void setOnBackPressed(IOnBackPressedListener backListener) {
+        this.mOnBackPressedListener = backListener;
     }
 }

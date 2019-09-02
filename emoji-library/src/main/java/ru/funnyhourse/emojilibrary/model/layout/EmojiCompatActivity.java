@@ -6,9 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 /**
  * Created by edgar on 18/02/2016.
  */
-public class EmojiCompatActivity extends AppCompatActivity {
+public class EmojiCompatActivity extends AppCompatActivity implements IEmojiActivity {
 
-    private OnBackPressedListener mOnBackPressedListener;
+    private IOnBackPressedListener mOnBackPressedListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +26,7 @@ public class EmojiCompatActivity extends AppCompatActivity {
         }
     }
 
-    public void setOnBackPressed(OnBackPressedListener backListener) {
+    public void setOnBackPressed(IOnBackPressedListener backListener) {
         this.mOnBackPressedListener = backListener;
-    }
-
-    public interface OnBackPressedListener {
-        Boolean onBackPressed();
     }
 }
