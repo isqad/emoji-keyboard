@@ -10,7 +10,8 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.DynamicDrawableSpan;
 import android.util.AttributeSet;
-import android.widget.TextView;
+
+import androidx.appcompat.widget.AppCompatTextView;
 
 import br.com.instachat.emojilibrary.R;
 import br.com.instachat.emojilibrary.util.EmojiUtil;
@@ -18,7 +19,7 @@ import br.com.instachat.emojilibrary.util.EmojiUtil;
 /**
  * @author Hieu Rocker (rockerhieu@gmail.com).
  */
-public class EmojiTextView extends TextView {
+public class EmojiTextView extends AppCompatTextView {
     private int mEmojiSize;
     private int mEmojiAlignment;
     private int mEmojiTextSize;

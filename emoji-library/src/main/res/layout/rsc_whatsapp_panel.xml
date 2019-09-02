@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<androidx.appcompat.widget.LinearLayoutCompat
     android:id="@+id/bottomLayoutWrapper"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,7 +9,7 @@
     android:layout_alignParentBottom="true"
     android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
@@ -17,7 +17,7 @@
 
         <include layout="@layout/rsc_util_remove_edittext_focus"/>
 
-        <LinearLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -28,19 +28,19 @@
             android:orientation="horizontal"
             android:paddingRight="20dp">
 
-            <LinearLayout
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/emojiButtonWrapper"
                 android:layout_width="48dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:paddingLeft="12dp">
 
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/emojiButton"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/input_emoji"/>
-            </LinearLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <br.com.instachat.emojilibrary.model.layout.EmojiEditText
                 android:id="@+id/input"
@@ -53,22 +53,20 @@
                 android:theme="@style/WhatsAppEditText"
                 app:emojiSize="25dip"/>
 
-        </LinearLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_margin="2dip"
             android:clickable="true"
             android:src="@drawable/ic_send_whatsapp"
             app:backgroundTint="@color/rsc_emoji_tab_indicator"
             app:borderWidth="0dp"
             app:elevation="2dp"/>
-    </LinearLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <include layout="@layout/rsc_emoji_keyboard"/>
-</LinearLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>
