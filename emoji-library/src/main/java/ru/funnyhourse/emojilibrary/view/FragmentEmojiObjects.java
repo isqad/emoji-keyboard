@@ -1,4 +1,4 @@
-package ru.funnyhourse.emojilibrary.controller.emoji_pages;
+package ru.funnyhourse.emojilibrary.view;
 
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -9,14 +9,10 @@ import android.widget.GridView;
 
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.adapter.EmojiAdapter;
-import ru.funnyhourse.emojilibrary.controller.FragmentEmoji;
 import ru.funnyhourse.emojilibrary.model.Emoji;
 import ru.funnyhourse.emojilibrary.model.Objects;
 
 
-/**
- * Created by edgar on 18/02/2016.
- */
 public class FragmentEmojiObjects extends FragmentEmoji {
 
     public static final String TAG = "FragmentEmojiObjects";
@@ -30,8 +26,8 @@ public class FragmentEmojiObjects extends FragmentEmoji {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.mRootView = inflater.inflate(R.layout.frag_emoji_objects, container, false);
-        return this.mRootView;
+        View v = inflater.inflate(R.layout.frag_emoji_objects, container, false);
+        return v;
 
     }
 

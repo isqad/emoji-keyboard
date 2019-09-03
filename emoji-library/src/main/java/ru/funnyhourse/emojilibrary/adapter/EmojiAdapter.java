@@ -9,7 +9,7 @@ import java.util.List;
 
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.model.Emoji;
-import ru.funnyhourse.emojilibrary.model.layout.EmojiTextView;
+import ru.funnyhourse.emojilibrary.view.EmojiTextView;
 
 /**
  * Created by Leonardo Assunção on 18/02/2016.

@@ -1,4 +1,4 @@
-package ru.funnyhourse.emojilibrary.model.layout;
+package ru.funnyhourse.emojilibrary.view;
 
 public interface IOnBackPressedListener {
     Boolean onBackPressed();

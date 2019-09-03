@@ -1,96 +1,54 @@
 package ru.funnyhourse.emojilibrary.adapter;
 
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import android.view.ViewGroup;
 
-import ru.funnyhourse.emojilibrary.controller.emoji_pages.FragmentEmojiNature;
-import ru.funnyhourse.emojilibrary.controller.emoji_pages.FragmentEmojiObjects;
-import ru.funnyhourse.emojilibrary.controller.emoji_pages.FragmentEmojiPeople;
-import ru.funnyhourse.emojilibrary.controller.emoji_pages.FragmentEmojiPlaces;
-import ru.funnyhourse.emojilibrary.controller.emoji_pages.FragmentEmojiRecents;
-import ru.funnyhourse.emojilibrary.controller.emoji_pages.FragmentEmojiSymbols;
-import ru.funnyhourse.emojilibrary.model.OnEmojiClickListener;
+import java.util.ArrayList;
+import java.util.List;
+
+import ru.funnyhourse.emojilibrary.presenter.IRecentEmojiSaver;
+import ru.funnyhourse.emojilibrary.presenter.OnEmojiClickListener;
+import ru.funnyhourse.emojilibrary.view.FragmentEmoji;
 
 public class EmojiTabAdapter extends FragmentPagerAdapter {
+    private final List<FragmentEmoji> mFragmentList = new ArrayList<>();
+    private final List<String> mFragmentTitleList = new ArrayList<>();
 
-    private FragmentEmojiRecents FRAGMENT_EMOJI_RECENTS = new FragmentEmojiRecents();
-    private FragmentEmojiPeople FRAGMENT_EMOJI_PEOPLE = new FragmentEmojiPeople();
-    private FragmentEmojiNature FRAGMENT_EMOJI_NATURE = new FragmentEmojiNature();
-    private FragmentEmojiObjects FRAGMENT_EMOJI_OBJECTS = new FragmentEmojiObjects();
-    private FragmentEmojiPlaces FRAGMENT_EMOJI_PLACES = new FragmentEmojiPlaces();
-    private FragmentEmojiSymbols FRAGMENT_EMOJI_SYMBOLS = new FragmentEmojiSymbols();
-
-
-    // CONTRACT
     public EmojiTabAdapter(FragmentManager fm) {
         super(fm);
-        FRAGMENT_EMOJI_PEOPLE.subscribeRecentListener(FRAGMENT_EMOJI_RECENTS);
-        FRAGMENT_EMOJI_NATURE.subscribeRecentListener(FRAGMENT_EMOJI_RECENTS);
-        FRAGMENT_EMOJI_OBJECTS.subscribeRecentListener(FRAGMENT_EMOJI_RECENTS);
-        FRAGMENT_EMOJI_PLACES.subscribeRecentListener(FRAGMENT_EMOJI_RECENTS);
-        FRAGMENT_EMOJI_SYMBOLS.subscribeRecentListener(FRAGMENT_EMOJI_RECENTS);
+    }
+
+    public void addFragment(FragmentEmoji fragmentEmoji, String title) {
+        mFragmentList.add(fragmentEmoji);
+        mFragmentTitleList.add(title);
     }
 
     // CALLBACKS
     @Override
     public CharSequence getPageTitle(int position) {
-        switch (position) {
-            case 0:
-                return "RECENTS";
-            case 1:
-                return "PEOPLE";
-            case 2:
-                return "NATURE";
-            case 3:
-                return "OBJECTS";
-            case 4:
-                return "PLACES";
-            case 5:
-                return "SYMBOLS";
-            default:
-                return "UNKNOW";
-        }
-    }
-
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        return super.instantiateItem(container, position);
+        return mFragmentTitleList.get(position);
     }
 
     @Override
     public int getCount() {
-        return 6;
+        return mFragmentList.size();
     }
 
     @Override
-    public androidx.fragment.app.Fragment getItem(int position) {
-        switch (position) {
-            case 0:
-                return FRAGMENT_EMOJI_RECENTS;
-            case 1:
-                return FRAGMENT_EMOJI_PEOPLE;
-            case 2:
-                return FRAGMENT_EMOJI_NATURE;
-            case 3:
-                return FRAGMENT_EMOJI_OBJECTS;
-            case 4:
-                return FRAGMENT_EMOJI_PLACES;
-            case 5:
-                return FRAGMENT_EMOJI_SYMBOLS;
-            default:
-                return FRAGMENT_EMOJI_RECENTS;
+    public Fragment getItem(int position) {
+        return mFragmentList.get(position);
+    }
+
+    public void setOnEmojiClickListener(OnEmojiClickListener listener) {
+        for (FragmentEmoji f : mFragmentList) {
+            f.addEmojiconClickListener(listener);
         }
     }
 
-    // GETTERS AND SETTERS
-    public void setOnEmojiClickListener(OnEmojiClickListener listener) {
-        FRAGMENT_EMOJI_RECENTS.addEmojiconClickListener(listener);
-        FRAGMENT_EMOJI_PEOPLE.addEmojiconClickListener(listener);
-        FRAGMENT_EMOJI_NATURE.addEmojiconClickListener(listener);
-        FRAGMENT_EMOJI_OBJECTS.addEmojiconClickListener(listener);
-        FRAGMENT_EMOJI_PLACES.addEmojiconClickListener(listener);
-        FRAGMENT_EMOJI_SYMBOLS.addEmojiconClickListener(listener);
+    public void setRecentEmojiSaver(IRecentEmojiSaver saver) {
+        for (FragmentEmoji f : mFragmentList) {
+            f.setSaver(saver);
+        }
     }
-
 }

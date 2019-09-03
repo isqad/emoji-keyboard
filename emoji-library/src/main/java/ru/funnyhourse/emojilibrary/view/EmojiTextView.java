@@ -1,4 +1,4 @@
-package ru.funnyhourse.emojilibrary.model.layout;
+package ru.funnyhourse.emojilibrary.view;
 
 /**
  * Created by Leonardo Assunção on 18/02/2016.

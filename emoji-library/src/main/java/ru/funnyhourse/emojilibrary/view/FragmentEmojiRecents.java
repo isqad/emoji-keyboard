@@ -1,4 +1,4 @@
-package ru.funnyhourse.emojilibrary.controller.emoji_pages;
+package ru.funnyhourse.emojilibrary.view;
 
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -12,18 +12,12 @@ import java.util.List;
 
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.adapter.EmojiAdapter;
-import ru.funnyhourse.emojilibrary.controller.FragmentEmoji;
 import ru.funnyhourse.emojilibrary.model.Emoji;
 import ru.funnyhourse.emojilibrary.util.Constants;
 
-/**
- * Created by edgar on 18/02/2016.
- */
-public class FragmentEmojiRecents extends FragmentEmoji implements FragmentEmoji.RecentListener {
-
+public class FragmentEmojiRecents extends FragmentEmoji implements RecentEmojiListener {
     public static final String TAG = "FragmentEmojiRecents";
 
-    private View mRootView;
     private GridView mGridView;
     private List<Emoji> mData;
     private EmojiAdapter mAdapter;
@@ -31,9 +25,9 @@ public class FragmentEmojiRecents extends FragmentEmoji implements FragmentEmoji
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
-        this.mRootView = inflater.inflate(R.layout.frag_emoji_recents, container, false);
-        return this.mRootView;
+        super.onCreateView(inflater, container, savedInstanceState);
+
+        return inflater.inflate(R.layout.frag_emoji_recents, container, false);
     }
 
     @Override
@@ -42,7 +36,7 @@ public class FragmentEmojiRecents extends FragmentEmoji implements FragmentEmoji
         Bundle bundle = getArguments();
 
         if (bundle == null) {
-            this.mData = mRecentEmojisManager.getRecentEmojis();
+            this.mData = saver.getRecentEmojis();
             this.mUseSystemDefault = false;
         } else {
             Parcelable[] parcels = bundle.getParcelableArray(Constants.EMOJI_KEY);
@@ -60,14 +54,11 @@ public class FragmentEmojiRecents extends FragmentEmoji implements FragmentEmoji
             this.mGridView.setAdapter(mAdapter);
             this.mGridView.setOnItemClickListener(this);
         }
-
-
-
     }
 
     @Override
     public void notifyEmojiAdded() {
-        if(mAdapter!=null)
+        if(mAdapter != null)
             mAdapter.notifyDataSetChanged();
     }
 }

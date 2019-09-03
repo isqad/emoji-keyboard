@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ru.funnyhourse.emojilibrary.R;
-import ru.funnyhourse.emojilibrary.model.layout.EmojiSpan;
+import ru.funnyhourse.emojilibrary.view.EmojiSpan;
 import ru.funnyhourse.emojilibrary.model.Nature;
 import ru.funnyhourse.emojilibrary.model.Objects;
 import ru.funnyhourse.emojilibrary.model.People;

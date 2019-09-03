@@ -1,4 +1,6 @@
-package ru.funnyhourse.emojilibrary.model;
+package ru.funnyhourse.emojilibrary.presenter;
+
+import ru.funnyhourse.emojilibrary.model.Emoji;
 
 /**
  * Created by edgar on 21/02/2016.

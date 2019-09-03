@@ -29,11 +29,10 @@ import ru.funnyhourse.emojikeyboard.adapter.MessageAdapter;
 import ru.funnyhourse.emojikeyboard.model.Message;
 import ru.funnyhourse.emojikeyboard.model.MessageType;
 import ru.funnyhourse.emojikeyboard.util.TimestampUtil;
-import ru.funnyhourse.emojilibrary.controller.TelegramPanel;
-import ru.funnyhourse.emojilibrary.model.layout.EmojiCompatActivity;
-import ru.funnyhourse.emojilibrary.model.layout.IEmojiActivity;
-import ru.funnyhourse.emojilibrary.model.layout.IOnBackPressedListener;
-import ru.funnyhourse.emojilibrary.model.layout.TelegramPanelEventListener;
+import ru.funnyhourse.emojilibrary.presenter.EmojiEditTextPanelPresenter;
+import ru.funnyhourse.emojilibrary.view.IEmojiActivity;
+import ru.funnyhourse.emojilibrary.view.IOnBackPressedListener;
+import ru.funnyhourse.emojilibrary.view.TelegramPanelEventListener;
 
 
 /**
@@ -48,7 +47,7 @@ public class ActivityTelegram extends AppCompatActivity implements TelegramPanel
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
 
-    private TelegramPanel mBottomPanel;
+    private EmojiEditTextPanelPresenter mBottomPanel;
     private RecyclerView mMessages;
     private MessageAdapter mAdapter;
 
@@ -63,7 +62,7 @@ public class ActivityTelegram extends AppCompatActivity implements TelegramPanel
         this.setTelegramTheme();
         this.initMessageList();
 
-        this.mBottomPanel = new TelegramPanel(this,
+        this.mBottomPanel = new EmojiEditTextPanelPresenter(this,
                                               (View)findViewById(R.id.mainlayout),
                                               this);
     }

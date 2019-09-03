@@ -19,19 +19,18 @@
         app:layout_scrollFlags="scroll|enterAlways"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <ru.funnyhourse.emojilibrary.model.layout.EmojiEditText
+        <ru.funnyhourse.emojilibrary.view.EmojiEditText
             android:id="@+id/input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Message"
             android:singleLine="true"
             android:textColor="@color/rsc_bottom_panel_accent"
-            android:textSize="18dip"
+            android:textSize="18sp"
             android:theme="@style/TelegramEditText"
             app:emojiSize="25dip"/>
 
     </androidx.appcompat.widget.Toolbar>
 
     <include layout="@layout/rsc_emoji_keyboard"/>
-
 </com.google.android.material.appbar.AppBarLayout>
