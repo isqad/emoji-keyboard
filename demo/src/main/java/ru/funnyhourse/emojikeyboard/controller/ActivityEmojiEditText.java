@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,27 +30,29 @@ import ru.funnyhourse.emojikeyboard.adapter.MessageAdapter;
 import ru.funnyhourse.emojikeyboard.model.Message;
 import ru.funnyhourse.emojikeyboard.model.MessageType;
 import ru.funnyhourse.emojikeyboard.util.TimestampUtil;
+import ru.funnyhourse.emojilibrary.adapter.EmojiTabAdapter;
 import ru.funnyhourse.emojilibrary.presenter.EmojiEditTextPanelPresenter;
-import ru.funnyhourse.emojilibrary.view.IEmojiActivity;
+import ru.funnyhourse.emojilibrary.view.EmojiEditTextPanel;
 import ru.funnyhourse.emojilibrary.view.IOnBackPressedListener;
-import ru.funnyhourse.emojilibrary.view.TelegramPanelEventListener;
+import ru.funnyhourse.emojilibrary.view.EmojiEditTextPanelEventListener;
 
 
 /**
  * Created by edgar on 17/02/2016.
  */
-public class ActivityTelegram extends AppCompatActivity implements TelegramPanelEventListener, IEmojiActivity {
+public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEditTextPanelEventListener {
 
-    public static final String TAG = "ActivityTelegram";
+    public static final String TAG = "ActivityEmojiEditText";
 
     private IOnBackPressedListener mOnBackPressedListener;
 
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
 
-    private EmojiEditTextPanelPresenter mBottomPanel;
     private RecyclerView mMessages;
     private MessageAdapter mAdapter;
+
+    private EmojiEditTextPanelPresenter presenter;
 
     // CALLBACKS
     @Override
@@ -62,9 +65,13 @@ public class ActivityTelegram extends AppCompatActivity implements TelegramPanel
         this.setTelegramTheme();
         this.initMessageList();
 
-        this.mBottomPanel = new EmojiEditTextPanelPresenter(this,
-                                              (View)findViewById(R.id.mainlayout),
-                                              this);
+        if (presenter == null) {
+            presenter = EmojiEditTextPanelPresenter.newInstance(
+                    (EmojiEditTextPanel) findViewById(R.id.bottompanel),
+                    getSupportFragmentManager(),
+                    savedInstanceState);
+            presenter.setEventListener(this);
+        }
     }
 
     @Override
@@ -77,11 +84,6 @@ public class ActivityTelegram extends AppCompatActivity implements TelegramPanel
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_toogle:
-                Intent intent = new Intent(ActivityTelegram.this, ActivityWhatsApp.class);
-                ActivityTelegram.this.startActivity(intent);
-                ActivityTelegram.this.finish();
-                break;
             case android.R.id.home:
                 if (this.mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
                     this.mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -117,7 +119,7 @@ public class ActivityTelegram extends AppCompatActivity implements TelegramPanel
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(
                 this,
                 this.mDrawerLayout,
-                ActivityTelegram.this.mToolbar,
+                ActivityEmojiEditText.this.mToolbar,
                 R.string.drawer_open,
                 R.string.drawer_close
         )
@@ -161,8 +163,8 @@ public class ActivityTelegram extends AppCompatActivity implements TelegramPanel
     }
 
     private void setTelegramTheme() {
-        ActivityTelegram.this.mToolbar.setTitle("Telegram");
-        ActivityTelegram.this.getWindow().setBackgroundDrawable(ActivityTelegram.this.getResources().getDrawable(R.drawable.telegram_bkg));
+        ActivityEmojiEditText.this.mToolbar.setTitle("Telegram");
+        ActivityEmojiEditText.this.getWindow().setBackgroundDrawable(ActivityEmojiEditText.this.getResources().getDrawable(R.drawable.telegram_bkg));
         this.mToolbar.setBackgroundColor(this.getResources().getColor(R.color.colorPrimaryTelegram));
         if (Build.VERSION.SDK_INT >= 21) {
             this.getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryTelegram));
@@ -172,23 +174,22 @@ public class ActivityTelegram extends AppCompatActivity implements TelegramPanel
     // TELEGRAM PANEL INTERFACE
     @Override
     public void onAttachClicked() {
-        Toast.makeText(ActivityTelegram.this, "Attach was clicked!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(ActivityEmojiEditText.this, "Attach was clicked!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onMicClicked() {
         Log.i(TAG, "Mic was clicked");
-        Toast.makeText(ActivityTelegram.this, "Mic was clicked!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(ActivityEmojiEditText.this, "Mic was clicked!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSendClicked() {
-        Log.i(TAG, "message: " + this.mBottomPanel.getText());
         Message message = new Message();
         message.setType(MessageType.OUTGOING);
         message.setTimestamp(TimestampUtil.getCurrentTimestamp());
-        message.setContent(this.mBottomPanel.getText());
-        this.mBottomPanel.setText("");
+        //message.setContent(this.mBottomPanel.getText());
+        //this.mBottomPanel.setText("");
         this.updateMessageList(message);
         this.echoMessage(message);
     }
@@ -197,7 +198,7 @@ public class ActivityTelegram extends AppCompatActivity implements TelegramPanel
         new AsyncTask<Void, Void, Message>() {
             @Override
             protected void onPostExecute(Message message) {
-                ActivityTelegram.this.updateMessageList(message);
+                ActivityEmojiEditText.this.updateMessageList(message);
             }
 
             @Override

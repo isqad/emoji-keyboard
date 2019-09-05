@@ -1,50 +1,30 @@
 package ru.funnyhourse.emojilibrary.view;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import androidx.annotation.NonNull;
+
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.adapter.EmojiAdapter;
-import ru.funnyhourse.emojilibrary.model.Emoji;
 import ru.funnyhourse.emojilibrary.model.Symbols;
+import ru.funnyhourse.emojilibrary.presenter.OnEmojiClickListener;
 
-public class FragmentEmojiSymbols extends FragmentEmoji {
-
-    public static final String TAG = "FragmentEmojiSymbols";
-
-    private Emoji[] mData;
-    private boolean mUseSystemDefault = false;
-
-    private static final String USE_SYSTEM_DEFAULT_KEY = "useSystemDefaults";
-    private static final String EMOJI_KEY = "emojic";
+public final class FragmentEmojiSymbols extends FragmentEmoji {
+    private OnEmojiClickListener mOnEmojiconClickedListener;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.frag_emoji_symbols, container, false);
-
-        return v;
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.frag_emoji_symbols, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         GridView gridView = (GridView) view.findViewById(R.id.Emoji_GridView);
-        Bundle bundle = getArguments();
-        if (bundle == null) {
-            mData = Symbols.DATA;
-            mUseSystemDefault = false;
-        } else {
-            Parcelable[] parcels = bundle.getParcelableArray(EMOJI_KEY);
-            mData = new Emoji[parcels.length];
-            for (int i = 0; i < parcels.length; i++) {
-                mData[i] = (Emoji) parcels[i];
-            }
-            mUseSystemDefault = bundle.getBoolean(USE_SYSTEM_DEFAULT_KEY);
-        }
-        gridView.setAdapter(new EmojiAdapter(view.getContext(), mData, mUseSystemDefault));
+        gridView.setAdapter(new EmojiAdapter(view.getContext(), Symbols.DATA, false));
         gridView.setOnItemClickListener(this);
     }
 }

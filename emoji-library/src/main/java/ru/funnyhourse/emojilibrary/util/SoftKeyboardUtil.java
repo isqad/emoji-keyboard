@@ -1,24 +1,33 @@
 package ru.funnyhourse.emojilibrary.util;
 
 import android.content.Context;
+import android.os.ResultReceiver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 
 public class SoftKeyboardUtil {
-
-    public static final String TAG = "SoftKeyboardUtil";
-
-    public static void dismissSoftKeyboard(Context context, EditText editText) {
+    public static boolean dismissSoftKeyboard(Context context, EditText editText, ResultReceiver resultReceiver) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-        editText.clearFocus();
+        boolean isHide = false;
+
+        if (imm != null) {
+            isHide = imm.hideSoftInputFromWindow(editText.getWindowToken(), 0, resultReceiver);
+            editText.clearFocus();
+        }
+
+        return isHide;
     }
 
-    public static void showSoftKeyboard(Context context, EditText editText) {
+    public static boolean showSoftKeyboard(Context context, EditText editText, ResultReceiver resultReceiver) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-        editText.requestFocus();
-    }
+        boolean isShow = false;
 
+        if (imm != null) {
+            editText.requestFocus();
+            isShow = imm.showSoftInput(editText, InputMethodManager.SHOW_FORCED, resultReceiver);
+        }
+
+        return isShow;
+    }
 }

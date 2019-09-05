@@ -1,50 +1,67 @@
 package ru.funnyhourse.emojilibrary.view;
 
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.adapter.EmojiAdapter;
 import ru.funnyhourse.emojilibrary.model.Emoji;
 import ru.funnyhourse.emojilibrary.model.People;
-import ru.funnyhourse.emojilibrary.util.Constants;
+import ru.funnyhourse.emojilibrary.model.RecentEmojiStorage;
+import ru.funnyhourse.emojilibrary.presenter.OnEmojiClickListener;
 
-public class FragmentEmojiPeople extends FragmentEmoji {
-
-    public static final String TAG = "FragmentEmojiPeople";
-
-    private Emoji[] mData;
-    private boolean mUseSystemDefault = false;
+public final class FragmentEmojiPeople extends Fragment implements AdapterView.OnItemClickListener {
+    private OnEmojiClickListener mOnEmojiconClickedListener;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.frag_emoji_people, container, false);
-        return v;
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.frag_emoji_people, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         GridView gridView = (GridView) view.findViewById(R.id.Emoji_GridView);
-        Bundle bundle = getArguments();
+        Log.d("FRAGMENT", "onViewCreated");
 
-        if (bundle == null) {
-            this.mData = People.DATA;
-            this.mUseSystemDefault = false;
-        } else {
-            Parcelable[] parcels = bundle.getParcelableArray(Constants.EMOJI_KEY);
-            this.mData = new Emoji[parcels.length];
-
-            for (int i = 0; i < parcels.length; i++) {
-                this.mData[i] = (Emoji) parcels[i];
-            }
-
-            this.mUseSystemDefault = bundle.getBoolean(Constants.USE_SYSTEM_DEFAULT_KEY);
-        }
-        gridView.setAdapter(new EmojiAdapter(view.getContext(), this.mData, this.mUseSystemDefault));
+        gridView.setAdapter(new EmojiAdapter(view.getContext(), People.DATA, false));
         gridView.setOnItemClickListener(this);
+
+        Log.d("FRAGMENT onViewCreated", this.toString());
+
+        if (savedInstanceState != null)
+            Log.d("FRAGMENT savedInstanceS", savedInstanceState.toString());
+    }
+
+    public void setEmojiconClickListener(OnEmojiClickListener listener) {
+        Log.d("FRAGMENT setListener", this.toString());
+        this.mOnEmojiconClickedListener = listener;
+    }
+
+    @Override
+    public void onItemClick(@NonNull AdapterView<?> parent, View view, int position, long id) {
+        Log.d("FRAGMENT on click", this.toString());
+        //if (mOnEmojiconClickedListener == null) {
+        //    return;
+        //}
+
+        final Emoji clickedEmoji = (Emoji) parent.getItemAtPosition(position);
+
+        Log.d("FRAGMENT", clickedEmoji.toString());
+
+        //mOnEmojiconClickedListener.onEmojiClicked(clickedEmoji);
+
+        //RecentEmojiStorage.addRecentEmoji(clickedEmoji);
+
+        //if(mRecentListener != null) {
+        //    mRecentListener.notifyEmojiAdded();
+       // }
     }
 }

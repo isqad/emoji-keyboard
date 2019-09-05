@@ -11,7 +11,7 @@ import java.util.List;
 import ru.funnyhourse.emojikeyboard.R;
 import ru.funnyhourse.emojikeyboard.model.Message;
 import ru.funnyhourse.emojikeyboard.util.TimestampUtil;
-import ru.funnyhourse.emojilibrary.model.layout.EmojiTextView;
+import ru.funnyhourse.emojilibrary.view.EmojiTextView;
 
 /**
  * This class binds and controls the events related to the elements from rsc_chat_canvas_xxx

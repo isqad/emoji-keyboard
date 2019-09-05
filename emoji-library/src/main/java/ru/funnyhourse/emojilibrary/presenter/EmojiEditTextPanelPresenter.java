@@ -1,18 +1,12 @@
 package ru.funnyhourse.emojilibrary.presenter;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.ResultReceiver;
+import android.util.Log;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.adapter.EmojiTabAdapter;
@@ -26,52 +20,25 @@ import ru.funnyhourse.emojilibrary.view.FragmentEmojiRecents;
 import ru.funnyhourse.emojilibrary.view.FragmentEmojiSymbols;
 import ru.funnyhourse.emojilibrary.view.IEmojiEditTextPanel;
 
-public class EmojiEditTextPanelPresenter implements IEmojiEditTextPanelPresenter, OnEmojiClickListener, IRecentEmojiSaver {
+public class EmojiEditTextPanelPresenter implements IEmojiEditTextPanelPresenter, OnEmojiClickListener {
     private EmojiEditTextPanelEventListener mListener;
 
-    private static final String PREFERENCES_FILE = "EmojiProperties";
-    private static final String RECENT_EMOJIS = "RECENTS";
-
     private IEmojiEditTextPanel view;
-    private FragmentManager fragmentManager;
 
-    private Boolean isEmojiKeyboardVisible = Boolean.FALSE;
-    private Context context;
+    private boolean isEmojiKeyboardVisible = false;
 
-    private volatile ArrayList<Emoji> recentEmojis = new ArrayList<>();
+    private EmojiEditTextPanelPresenter() {}
 
-    public EmojiEditTextPanelPresenter(Context context,
-                                       IEmojiEditTextPanel view,
-                                       FragmentManager fragmentManager) {
-        this.view = view;
-        this.view.setPresenter(this);
+    public static EmojiEditTextPanelPresenter newInstance(IEmojiEditTextPanel view,
+                                                          FragmentManager fm,
+                                                          Bundle savedInstanceState) {
+        EmojiEditTextPanelPresenter presenter = new EmojiEditTextPanelPresenter();
+        presenter.setView(view);
 
-        this.fragmentManager = fragmentManager;
-        this.context = context;
+        if (savedInstanceState == null)
+            presenter.setTabAdapter(new EmojiTabAdapter(fm));
 
-        recentEmojis = getSavedRecentEmojis();
-
-        this.view.initBottomPanel();
-        this.view.configureInput();
-
-        initEmojiTabs();
-
-        this.view.setBackspaceBehaviour();
-    }
-
-    private void initEmojiTabs() {
-        final EmojiTabAdapter emojiTabAdapter = new EmojiTabAdapter(this.fragmentManager);
-        emojiTabAdapter.addFragment(new FragmentEmojiRecents(), "RECENTS");
-        emojiTabAdapter.addFragment(new FragmentEmojiPeople(), "PEOPLE");
-        emojiTabAdapter.addFragment(new FragmentEmojiNature(), "NATURE");
-        emojiTabAdapter.addFragment(new FragmentEmojiObjects(), "OBJECTS");
-        emojiTabAdapter.addFragment(new FragmentEmojiPlaces(), "PLACES");
-        emojiTabAdapter.addFragment(new FragmentEmojiSymbols(), "SYMBOLS");
-
-        emojiTabAdapter.setRecentEmojiSaver(this);
-
-        emojiTabAdapter.setOnEmojiClickListener(this);
-        this.view.setViewPagerAdapter(emojiTabAdapter);
+        return presenter;
     }
 
     /**
@@ -103,25 +70,60 @@ public class EmojiEditTextPanelPresenter implements IEmojiEditTextPanelPresenter
     //    this.mInput.setText(text);
     //}
 
-
+    /**
+     * Sets event listener for click to send text, attach and mic icon
+     * @param listener EmojiEditTextPanelEventListener
+     */
     @Override
     public void setEventListener(EmojiEditTextPanelEventListener listener) {
         mListener = listener;
     }
 
+    /**
+     * Event listener for click to keyboard or smile icon
+     */
     @Override
     public void onBottomPanelNavigationClick() {
         if (isEmojiKeyboardVisible) {
-            view.closeCurtain();
-            view.toggleSoftKeyboard();
-        } else {
-            view.closeCurtain();
-            view.showKeyboardIcon();
+            isEmojiKeyboardVisible = false;
 
-            showEmojiKeyboard(0);
+            boolean isShow = view.showSoftKeyboard(new ResultReceiver(null) {
+                @Override
+                protected void onReceiveResult(int resultCode, Bundle resultData) {
+                    view.hideEmojiKeyboard();
+                }
+            });
+
+            if (!isShow) {
+                view.hideEmojiKeyboard();
+            }
+
+            view.showEmojiIcon();
+        } else {
+            isEmojiKeyboardVisible = true;
+
+            boolean isHide = view.hideSoftKeyboard(new ResultReceiver(null) {
+                @Override
+                protected void onReceiveResult(int resultCode, Bundle resultData) {
+                    view.showEmojiKeyboard();
+                }
+            });
+
+            // Already hidden
+            if (!isHide) {
+                view.showEmojiKeyboard();
+            }
+
+            view.showKeyboardIcon();
         }
     }
 
+    /**
+     * Event listener for click to attach or mic icon
+     *
+     * @param item MenuItem
+     * @return boolean
+     */
     @Override
     public boolean onBottomPanelMenuItemClick(MenuItem item) {
         if (mListener != null) {
@@ -134,82 +136,49 @@ public class EmojiEditTextPanelPresenter implements IEmojiEditTextPanelPresenter
                     mListener.onSendClicked();
                 }
             }
-            return Boolean.TRUE;
+            return true;
         }
-        return Boolean.FALSE;
+        return false;
     }
 
+    /**
+     * When focus on input show keyboard
+     */
     @Override
     public void onSoftKeyboardDisplay() {
-        if (!isEmojiKeyboardVisible) {
-            view.openCurtain();
-            showEmojiKeyboard(200);
+        boolean isShow = view.showSoftKeyboard(new ResultReceiver(null) {
+            @Override
+            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                view.hideEmojiKeyboard();
+            }
+        });
+
+        if (!isShow) {
+            view.hideEmojiKeyboard();
+        }
+
+        view.showEmojiIcon();
+
+        if (isEmojiKeyboardVisible) {
+            isEmojiKeyboardVisible = false;
         }
     }
 
     @Override
     public void onSoftKeyboardHidden() {
-        if (isEmojiKeyboardVisible) {
-            view.closeCurtain();
-            hideEmojiKeyboard(200);
-        }
     }
 
     @Override
     public void onEmojiClicked(Emoji emoji) {
+        Log.d("Presenter", emoji.toString());
+
         view.appendEmojiToText(emoji);
     }
 
-    @Override
-    public void addRecentEmoji(Emoji recentEmoji) {
-        int emojiPosition = recentEmojis.indexOf(recentEmoji);
-        if(emojiPosition != -1){
-            recentEmojis.remove(emojiPosition);
-        }
-        recentEmojis.add(0,recentEmoji);
-
-        SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
-        final RecentEmojisSaver asyncSaver = new RecentEmojisSaver(sp, recentEmojis);
-        asyncSaver.execute();
-    }
-
-    private static class RecentEmojisSaver extends AsyncTask<Void, Void, Boolean> {
-        private final ArrayList<Emoji> recentEmojis;
-        private SharedPreferences sp;
-
-        public RecentEmojisSaver(SharedPreferences sp, ArrayList<Emoji> emojis) {
-            recentEmojis = emojis;
-            this.sp = sp;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            Gson gson = new Gson();
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putString(RECENT_EMOJIS, gson.toJson(recentEmojis));
-            return editor.commit();
-        }
-    }
-
-    @Override
-    public ArrayList<Emoji> getRecentEmojis() {
-        return recentEmojis;
-    }
-
-    private ArrayList<Emoji> getSavedRecentEmojis() {
-        Gson gson = new GsonBuilder().setDateFormat("MMM dd, yyyy HH:MM:ss").create();
-        Type type = new TypeToken<ArrayList<Emoji>>() {
-        }.getType();
-        SharedPreferences mReader = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
-        ArrayList<Emoji> list = gson.fromJson(mReader.getString(RECENT_EMOJIS, ""), type);
-        if (list == null) {
-            return new ArrayList<>();
-        } else {
-            return list;
-        }
-    }
-
     private void showEmojiKeyboard(int delay) {
+
+        Log.d("P", "show emoji");
+
         if (delay > 0) {
             try {
                 Thread.sleep(delay);
@@ -218,7 +187,6 @@ public class EmojiEditTextPanelPresenter implements IEmojiEditTextPanelPresenter
             }
         }
 
-        isEmojiKeyboardVisible = Boolean.TRUE;
         view.showEmojiKeyboard();
     }
 
@@ -231,8 +199,27 @@ public class EmojiEditTextPanelPresenter implements IEmojiEditTextPanelPresenter
             }
         }
 
-        view.showEmojiIcon();
-        isEmojiKeyboardVisible = Boolean.FALSE;
         view.hideEmojiKeyboard();
+    }
+
+    private void setView(IEmojiEditTextPanel view) {
+        this.view = view;
+        this.view.setPresenter(this);
+        this.view.initBottomPanel();
+        this.view.configureInput();
+        this.view.setBackspaceBehaviour();
+    }
+
+    private void setTabAdapter(@NonNull EmojiTabAdapter tabAdapter) {
+        tabAdapter.addFragment(new FragmentEmojiRecents(), "RECENTS");
+        //tabAdapter.addFragment(new FragmentEmojiPeople(), "PEOPLE");
+        tabAdapter.addFragment(new FragmentEmojiNature(), "NATURE");
+        tabAdapter.addFragment(new FragmentEmojiObjects(), "OBJECTS");
+        tabAdapter.addFragment(new FragmentEmojiPlaces(), "PLACES");
+        tabAdapter.addFragment(new FragmentEmojiSymbols(), "SYMBOLS");
+
+        tabAdapter.setOnEmojiClickListener(this);
+
+        this.view.setViewPagerAdapter(tabAdapter);
     }
 }

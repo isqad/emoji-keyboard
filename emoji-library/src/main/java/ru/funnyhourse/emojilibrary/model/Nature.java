@@ -267,7 +267,6 @@ public class Nature {
         map.put(0x1f982, R.drawable.emoji_1f982);
         map.put(0x1f3f5, R.drawable.emoji_1f3f5);
         map.put(0x2618, R.drawable.emoji_2618);
-
     }
 
     public static void bindSoftBankEmojis(SparseIntArray map) {

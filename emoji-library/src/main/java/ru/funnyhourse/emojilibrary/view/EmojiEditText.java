@@ -2,6 +2,7 @@ package ru.funnyhourse.emojilibrary.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.ResultReceiver;
 import android.text.style.DynamicDrawableSpan;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -15,9 +16,6 @@ import ru.funnyhourse.emojilibrary.util.EmojiUtil;
 import ru.funnyhourse.emojilibrary.util.SoftKeyboardUtil;
 
 public class EmojiEditText extends AppCompatEditText {
-
-    public static final String TAG = "EmojiEditText";
-
     private Context mContext;
     private OnSoftKeyboardListener mOnSoftKeyboardListener;
     private Boolean isSoftKeyboardVisible = Boolean.FALSE;
@@ -61,9 +59,9 @@ public class EmojiEditText extends AppCompatEditText {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    if (EmojiEditText.this.mOnSoftKeyboardListener != null) {
-                        EmojiEditText.this.isSoftKeyboardVisible = Boolean.TRUE;
-                        EmojiEditText.this.mOnSoftKeyboardListener.onSoftKeyboardDisplay();
+                    if (mOnSoftKeyboardListener != null) {
+                        isSoftKeyboardVisible = Boolean.TRUE;
+                        mOnSoftKeyboardListener.onSoftKeyboardDisplay();
                     }
                 }
             }
@@ -76,6 +74,7 @@ public class EmojiEditText extends AppCompatEditText {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             InputMethodManager mgr = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
             mgr.hideSoftInputFromWindow(this.getWindowToken(), 0);
+
             if (this.mOnSoftKeyboardListener != null) {
                 this.clearFocus();
                 EmojiEditText.this.isSoftKeyboardVisible = Boolean.FALSE;
@@ -103,21 +102,24 @@ public class EmojiEditText extends AppCompatEditText {
     }
 
     // SOFT KEYBOARD LISTENER
-    public void showSoftKeyboard() {
-        this.isSoftKeyboardVisible = Boolean.TRUE;
-        SoftKeyboardUtil.showSoftKeyboard(this.mContext, this);
+    public boolean showSoftKeyboard(ResultReceiver resultReceiver) {
+        isSoftKeyboardVisible = true;
+
+        return SoftKeyboardUtil.showSoftKeyboard(this.mContext, this, resultReceiver);
     }
 
-    public void hideSoftKeyboard() {
-        this.isSoftKeyboardVisible = Boolean.FALSE;
-        this.clearFocus();
-        SoftKeyboardUtil.dismissSoftKeyboard(this.mContext, this);
+    public boolean hideSoftKeyboard(ResultReceiver resultReceiver) {
+        isSoftKeyboardVisible = false;
+
+        clearFocus();
+
+        return SoftKeyboardUtil.dismissSoftKeyboard(this.mContext, this, resultReceiver);
     }
 
     public interface OnSoftKeyboardListener {
-        public void onSoftKeyboardDisplay();
+        void onSoftKeyboardDisplay();
 
-        public void onSoftKeyboardHidden();
+        void onSoftKeyboardHidden();
     }
 
     // GETTERS AND SETTERS

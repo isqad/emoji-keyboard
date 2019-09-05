@@ -5,8 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainlayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/header"
@@ -44,7 +43,7 @@
                 android:stackFromBottom="false"
                 android:transcriptMode="normal"/>
 
-            <ru.funnyhourse.emojilibrary.model.layout.TelegramPanel
+            <ru.funnyhourse.emojilibrary.view.EmojiEditTextPanel
                 android:id="@+id/bottompanel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

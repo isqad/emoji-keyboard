@@ -3,6 +3,7 @@ package ru.funnyhourse.emojilibrary.view;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.os.ResultReceiver;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -29,7 +31,6 @@ import ru.funnyhourse.emojilibrary.presenter.IEmojiEditTextPanelPresenter;
 
 public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPanel {
     private Toolbar mBottomPanel;
-    private LinearLayout mCurtain;
 
     private EmojiEditText mInput;
 
@@ -64,12 +65,12 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
     }
 
     // INITIALIZATIONS
-    private void init(Context context) {
+    private void init(@NonNull Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.rsc_telegram_panel, this, true);
+        if (inflater != null)
+            inflater.inflate(R.layout.edit_panel, this, true);
 
         mBottomPanel = (Toolbar)findViewById(R.id.panel);
-        mCurtain = (LinearLayout)findViewById(R.id.curtain);
         mInput = (EmojiEditText)mBottomPanel.findViewById(R.id.input);
         mEmojiKeyboardLayout = (RelativeLayout) findViewById(R.id.emoji_keyboard);
     }
@@ -100,39 +101,18 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
     }
 
     @Override
-    public void hideSoftKeyboard() {
-        mInput.hideSoftKeyboard();
-    }
-
-    @Override
-    public void showSoftKeyboard() {
-        mInput.showSoftKeyboard();
-    }
-
-    @Override
     public boolean isSoftKeyboardVisible() {
         return mInput.isSoftKeyboardVisible();
     }
 
     @Override
-    public void openCurtain() {
-        mCurtain.setVisibility(LinearLayout.VISIBLE);
+    public boolean hideSoftKeyboard(ResultReceiver resultReceiver) {
+        return mInput.hideSoftKeyboard(resultReceiver);
     }
 
     @Override
-    public void closeCurtain() {
-        mCurtain.setVisibility(LinearLayout.INVISIBLE);
-    }
-
-    @Override
-    public void toggleSoftKeyboard() {
-        if (isSoftKeyboardVisible()) {
-            hideSoftKeyboard();
-            showKeyboardIcon();
-        } else {
-            showSoftKeyboard();
-            showEmojiIcon();
-        }
+    public boolean showSoftKeyboard(ResultReceiver resultReceiver) {
+        return mInput.showSoftKeyboard(resultReceiver);
     }
 
     @Override
@@ -153,8 +133,8 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
     @Override
     public void configureInput() {
         final MenuItem micButton = mBottomPanel.getMenu().findItem(R.id.action_mic);
-
-        mInput.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        final View iconAttach = mBottomPanel.findViewById(R.id.action_attach);
+        final View iconMic = mBottomPanel.findViewById(R.id.action_mic);
 
         mInput.addOnSoftKeyboardListener(new EmojiEditText.OnSoftKeyboardListener() {
             @Override
@@ -176,25 +156,31 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!getInputText().toString().equals("") && mToogleIcon) {
                     mToogleIcon = Boolean.FALSE;
-                    mBottomPanel.findViewById(R.id.action_attach).animate().scaleX(0).scaleY(0).setDuration(150).start();
 
-                    mBottomPanel.findViewById(R.id.action_mic).animate().scaleX(0).scaleY(0).setDuration(75).withEndAction(
+                    iconAttach.animate().scaleX(0).scaleY(0).setDuration(150).start();
+                    iconAttach.setVisibility(View.GONE);
+
+                    iconMic.animate().scaleX(0).scaleY(0).setDuration(75).withEndAction(
                             new Runnable() {
                                 @Override
                                 public void run() {
                                     micButton.setIcon(R.drawable.ic_send_telegram);
-                                    mBottomPanel.findViewById(R.id.action_mic).animate().scaleX(1).scaleY(1).setDuration(75).start();
+                                    iconMic.animate().scaleX(1).scaleY(1).setDuration(75).start();
                                 }
                             }).start();
+
                 } else if (getInputText().toString().equals("")) {
                     mToogleIcon = Boolean.TRUE;
-                    mBottomPanel.findViewById(R.id.action_attach).animate().scaleX(1).scaleY(1).setDuration(150).start();
-                    mBottomPanel.findViewById(R.id.action_mic).animate().scaleX(0).scaleY(0).setDuration(75).withEndAction(
+
+                    iconAttach.setVisibility(View.VISIBLE);
+                    iconAttach.animate().scaleX(1).scaleY(1).setDuration(150).start();
+
+                    iconMic.animate().scaleX(0).scaleY(0).setDuration(75).withEndAction(
                             new Runnable() {
                                 @Override
                                 public void run() {
                                     micButton.setIcon(R.drawable.ic_microphone_grey600_24dp);
-                                    mBottomPanel.findViewById(R.id.action_mic).animate().scaleX(1).scaleY(1).setDuration(75).start();
+                                    iconMic.animate().scaleX(1).scaleY(1).setDuration(75).start();
                                 }
                             }).start();
                 }
@@ -224,10 +210,13 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
         if (start < 0) {
             mInput.append(emojiSymbol);
         } else {
-            mInput.getText().replace(
-                    Math.min(start, end),
-                    Math.max(start, end),
-                    emojiSymbol, 0, emojiSymbol.length());
+            Editable editable = mInput.getText();
+
+            if (editable != null)
+                editable.replace(
+                        Math.min(start, end),
+                        Math.max(start, end),
+                        emojiSymbol, 0, emojiSymbol.length());
         }
     }
 
@@ -238,7 +227,7 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
 
         final SmartTabLayout viewPagerTab = (SmartTabLayout)findViewById(R.id.emoji_tabs);
         final LayoutInflater inf = LayoutInflater.from(getContext().getApplicationContext());
-
+/**
         viewPagerTab.setCustomTabView(new SmartTabLayout.TabProvider() {
             @Override
             public View createTabView(ViewGroup container, int position, PagerAdapter adapter) {
@@ -338,6 +327,7 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
             @Override
             public void onPageScrollStateChanged(int state) {}
         });
+ **/
         viewPagerTab.setViewPager(viewPager);
     }
 

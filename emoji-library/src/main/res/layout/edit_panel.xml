@@ -7,8 +7,6 @@
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true">
 
-    <include layout="@layout/rsc_util_remove_edittext_focus"/>
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/panel"
         android:layout_width="match_parent"

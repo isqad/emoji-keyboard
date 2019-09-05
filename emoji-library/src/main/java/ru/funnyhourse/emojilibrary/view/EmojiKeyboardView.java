@@ -39,7 +39,5 @@ public class EmojiKeyboardView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.rsc_emoji_keyboard, this, true);
         this.findViewById(R.id.emoji_keyboard).setVisibility(RelativeLayout.VISIBLE);
-        LinearLayout curtain = (LinearLayout) this.findViewById(R.id.curtain);
-        curtain.setVisibility(LinearLayout.INVISIBLE);
     }
 }
