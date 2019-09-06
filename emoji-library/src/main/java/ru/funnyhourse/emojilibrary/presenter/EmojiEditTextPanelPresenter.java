@@ -2,6 +2,7 @@ package ru.funnyhourse.emojilibrary.presenter;
 
 import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.text.Editable;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -169,6 +170,26 @@ public class EmojiEditTextPanelPresenter implements IEmojiEditTextPanelPresenter
     @Override
     public void onEmojiClicked(Emoji emoji) {
         view.appendEmojiToText(emoji);
+    }
+
+    @Override
+    public String getText() {
+        Editable text = view.getInputText();
+        if (text == null) {
+            return "";
+        } else {
+            return text.toString();
+        }
+    }
+
+    @Override
+    public void setText(String text) {
+        view.setInputText(text);
+    }
+
+    @Override
+    public void clearText() {
+        view.setInputText("");
     }
 
     private void showEmojiKeyboard(int delay) {

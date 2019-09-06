@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,16 +29,11 @@ import ru.funnyhourse.emojikeyboard.adapter.MessageAdapter;
 import ru.funnyhourse.emojikeyboard.model.Message;
 import ru.funnyhourse.emojikeyboard.model.MessageType;
 import ru.funnyhourse.emojikeyboard.util.TimestampUtil;
-import ru.funnyhourse.emojilibrary.adapter.EmojiTabAdapter;
 import ru.funnyhourse.emojilibrary.presenter.EmojiEditTextPanelPresenter;
 import ru.funnyhourse.emojilibrary.view.EmojiEditTextPanel;
-import ru.funnyhourse.emojilibrary.view.IOnBackPressedListener;
 import ru.funnyhourse.emojilibrary.view.EmojiEditTextPanelEventListener;
+import ru.funnyhourse.emojilibrary.view.IOnBackPressedListener;
 
-
-/**
- * Created by edgar on 17/02/2016.
- */
 public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEditTextPanelEventListener {
 
     public static final String TAG = "ActivityEmojiEditText";
@@ -58,16 +52,15 @@ public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEdi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.act_telegram);
+        this.setContentView(R.layout.act_smartchat);
 
         this.initToolbar();
         this.initDrawerMenu();
         this.setTelegramTheme();
         this.initMessageList();
 
-        presenter = EmojiEditTextPanelPresenter.newInstance(
-                (EmojiEditTextPanel) findViewById(R.id.bottompanel),
-                getSupportFragmentManager());
+        EmojiEditTextPanel editTextPanel = (EmojiEditTextPanel) findViewById(R.id.bottompanel);
+        presenter = EmojiEditTextPanelPresenter.newInstance(editTextPanel, getSupportFragmentManager());
         presenter.setEventListener(this);
     }
 
@@ -108,7 +101,7 @@ public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEdi
         thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/instachat/emoji-library"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/isqad/emoji-library"));
                 startActivity(browserIntent);
             }
         });
@@ -154,13 +147,13 @@ public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEdi
         this.mToolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp);
         this.getWindow().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.telegram_bkg));
         this.setSupportActionBar(this.mToolbar);
-        this.getSupportActionBar().setTitle("Telegram");
+        this.getSupportActionBar().setTitle("Smartchat");
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setHomeButtonEnabled(true);
     }
 
     private void setTelegramTheme() {
-        ActivityEmojiEditText.this.mToolbar.setTitle("Telegram");
+        ActivityEmojiEditText.this.mToolbar.setTitle("Smartchat");
         ActivityEmojiEditText.this.getWindow().setBackgroundDrawable(ActivityEmojiEditText.this.getResources().getDrawable(R.drawable.telegram_bkg));
         this.mToolbar.setBackgroundColor(this.getResources().getColor(R.color.colorPrimaryTelegram));
         if (Build.VERSION.SDK_INT >= 21) {
@@ -185,8 +178,10 @@ public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEdi
         Message message = new Message();
         message.setType(MessageType.OUTGOING);
         message.setTimestamp(TimestampUtil.getCurrentTimestamp());
-        //message.setContent(this.mBottomPanel.getText());
-        //this.mBottomPanel.setText("");
+
+        message.setContent(presenter.getText());
+        presenter.clearText();
+
         this.updateMessageList(message);
         this.echoMessage(message);
     }

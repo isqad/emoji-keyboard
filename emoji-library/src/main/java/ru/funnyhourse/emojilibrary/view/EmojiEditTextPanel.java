@@ -342,4 +342,9 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
             }
         });
     }
+
+    @Override
+    public void setInputText(String text) {
+        mInput.setText(text);
+    }
 }

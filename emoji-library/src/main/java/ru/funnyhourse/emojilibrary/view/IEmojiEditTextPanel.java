@@ -31,4 +31,6 @@ public interface IEmojiEditTextPanel {
     void setViewPagerAdapter(EmojiTabAdapter adapter);
 
     void setBackspaceBehaviour();
+
+    void setInputText(String text);
 }

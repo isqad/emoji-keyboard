@@ -12,4 +12,8 @@ public interface IEmojiEditTextPanelPresenter {
     void onSoftKeyboardHidden();
 
     void setEventListener(EmojiEditTextPanelEventListener listener);
+
+    String getText();
+    void setText(String text);
+    void clearText();
 }

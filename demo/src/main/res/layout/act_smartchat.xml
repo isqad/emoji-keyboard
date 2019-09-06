@@ -50,7 +50,7 @@
                 android:layout_alignParentBottom="true"/>
         </RelativeLayout>
 
-        <include layout="@layout/rsc_telegram_drawer_menu_content"/>
+        <include layout="@layout/rsc_smartchat_drawer_menu_content"/>
 
     </androidx.drawerlayout.widget.DrawerLayout>
 </RelativeLayout>

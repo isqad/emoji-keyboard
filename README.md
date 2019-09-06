@@ -1,41 +1,68 @@
 # Android Emoji Keyboard
+
 A library to provide an emoji-keyboard implementation for Android applications
 
-<a name="showcase" />
-
-# Showcase
 <p align="center">
-<img src="showcase/telegram.gif" align="center"  hspace="20">
-<img src="showcase/emojilayout.gif" align="center">
-<img src="showcase/whatsapp.gif" align="center" hspace="20">
+<img src="showcase/animation.gif" align="center"  hspace="20">
 </p>
 
-# Quicky Setup
+# Quickly Setup
+
 ```
 dependencies {
     compile 'ru.funnyhourse:emoji-library:1.0.0'
 }
 ```
-Refer to the [wiki](https://github.com/instachat/emoji-library/wiki/Development) section.
 
-<a name="third-part-libraries" />
+Then add to your layout:
 
-# Third Part Libraries & Special Thanks
-* [Rockerhieu / emojicon](#REF1): _Do you like emojis in Whatsapp, iMessage? Emojicon is a library to implement such a thing for Android_;
-* [DrKLO / Telegram](#REF2): _Telegram is a messaging app with a focus on speed and security. It’s superfast, simple and free. This repo contains the official source code for Telegram App for Android;_
-* [ogaclejapan/ SmartTabLayout](#REF3): _A custom ViewPager title strip which gives continuous feedback to the user when scrolling;_
-* [lopspower / CircularImageView](#REF4): _This is an Android project allowing to realize a circular ImageView in the simplest way possible;_
-* [square / picasso](#REF5): _A powerful image downloading and caching library for Android;_
+```xml
+<ru.funnyhourse.emojilibrary.view.EmojiEditTextPanel
+                android:id="@+id/bottompanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"/>
+```
 
-<a name="team-members"></a>
-# Team Members
-* "Fernandes S. Edgar" <fernandes.s.edgar@gmail.com>
-* "Leonardo Assunção" <leo.assuncao92@gmail.com>
-* "Andrew Shalaev" <isqad88@gmail.com>
+Initialize presenter in your activity/fragment:
 
-<a name="license"></a>
+```java
+public class SmartChatActivity extends AppCompatActivity implements EmojiEditTextPanelEventListener {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.smartchat);
+
+        EmojiEditTextPanel editTextPanel = (EmojiEditTextPanel) findViewById(R.id.bottompanel);
+        presenter = EmojiEditTextPanelPresenter.newInstance(editTextPanel, getSupportFragmentManager());
+        presenter.setEventListener(this);
+    }
+
+    @Override
+    public void onAttachClicked() {
+        Log.i(TAG, "Attach was clicked");
+    }
+
+    @Override
+    public void onMicClicked() {
+        Log.i(TAG, "Mic was clicked");
+    }
+
+    @Override
+    public void onSendClicked() {
+        Log.i(TAG, "Send was clicked");
+    }
+```
+
+# TODO
+
+* More tests
+* Add onBackClickListener for closing keyboard
+* Configure EmojiEditTextPanel
+* Documentation
+
 # License
-Copyright 2015 Edgar da Silva Fernandes | Leonardo Assunção
+
 Copyright 2019 Andrew Shalaev
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,23 +75,4 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License. 
-
-<a name="references"></a>
-
-# References
-<a name="REF1"></a>
-
-* [REF1] - https://github.com/rockerhieu/emojicon
-<a name="REF2"></a>
-
-* [REF2] - https://github.com/DrKLO/Telegram
-<a name="REF3"></a>
-
-* [REF3] - https://github.com/ogaclejapan/SmartTabLayout
-<a name="REF4"></a>
-
-* [REF4] - https://github.com/lopspower/CircularImageView
-<a name="REF5"></a>
-
-* [REF5] - https://github.com/square/picasso
+limitations under the License.
