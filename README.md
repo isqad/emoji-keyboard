@@ -3,7 +3,7 @@
 A library to provide an emoji-keyboard implementation for Android applications
 
 <p align="center">
-<img src="showcase/animation.gif" align="center"  hspace="20">
+<img src="showcase/20190906_173816.gif" align="center"  hspace="20">
 </p>
 
 # Quickly Setup
