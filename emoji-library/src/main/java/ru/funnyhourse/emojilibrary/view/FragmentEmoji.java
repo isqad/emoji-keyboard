@@ -14,9 +14,9 @@ public class FragmentEmoji extends Fragment implements AdapterView.OnItemClickLi
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d("FRAGMENT", mOnEmojiconClickedListener.toString());
-
         if (mOnEmojiconClickedListener == null) {
+            Log.d("FRAGMENT", "Listener is NULL");
+
             return;
         }
 
@@ -32,7 +32,9 @@ public class FragmentEmoji extends Fragment implements AdapterView.OnItemClickLi
     }
 
     public void setEmojiconClickListener(OnEmojiClickListener listener) {
-        this.mOnEmojiconClickedListener = listener;
+        OnEmojiClickListener l = listener;
+
+        this.mOnEmojiconClickedListener = l;
     }
 
     public void subscribeRecentListener(RecentEmojiListener listener) {

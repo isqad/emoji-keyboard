@@ -11,9 +11,6 @@ import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.model.Emoji;
 import ru.funnyhourse.emojilibrary.view.EmojiTextView;
 
-/**
- * Created by Leonardo Assunção on 18/02/2016.
- */
 public class EmojiAdapter extends ArrayAdapter<Emoji> {
 
     private boolean mUseSystemDefault = Boolean.FALSE;

@@ -13,10 +13,8 @@ import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.adapter.EmojiAdapter;
 import ru.funnyhourse.emojilibrary.model.Emoji;
 import ru.funnyhourse.emojilibrary.model.RecentEmojiStorage;
-import ru.funnyhourse.emojilibrary.presenter.OnEmojiClickListener;
 
 public final class FragmentEmojiRecents extends FragmentEmoji implements RecentEmojiListener {
-    private OnEmojiClickListener mOnEmojiconClickedListener;
     private EmojiAdapter mAdapter;
 
     @Override

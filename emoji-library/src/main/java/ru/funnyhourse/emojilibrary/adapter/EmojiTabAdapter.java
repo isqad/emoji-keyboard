@@ -1,7 +1,8 @@
 package ru.funnyhourse.emojilibrary.adapter;
 
-import android.util.Log;
+import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -11,21 +12,12 @@ import java.util.List;
 
 import ru.funnyhourse.emojilibrary.presenter.OnEmojiClickListener;
 import ru.funnyhourse.emojilibrary.view.FragmentEmoji;
-import ru.funnyhourse.emojilibrary.view.FragmentEmojiPeople;
 
 public class EmojiTabAdapter extends FragmentPagerAdapter {
     private final List<FragmentEmoji> mFragmentList = new ArrayList<>();
     private final List<String> mFragmentTitleList = new ArrayList<>();
 
-    private FragmentEmojiPeople FRAGMENT_EMOJI_PEOPLE = new FragmentEmojiPeople();
-    /**
-    private static FragmentEmojiRecents FRAGMENT_EMOJI_RECENTS = new FragmentEmojiRecents();
-    private FragmentEmojiPeople FRAGMENT_EMOJI_PEOPLE = new FragmentEmojiPeople();
-    private static FragmentEmojiNature FRAGMENT_EMOJI_NATURE = new FragmentEmojiNature();
-    private static FragmentEmojiObjects FRAGMENT_EMOJI_OBJECTS = new FragmentEmojiObjects();
-    private static FragmentEmojiPlaces FRAGMENT_EMOJI_PLACES = new FragmentEmojiPlaces();
-    private static FragmentEmojiSymbols FRAGMENT_EMOJI_SYMBOLS = new FragmentEmojiSymbols();
-    **/
+    private OnEmojiClickListener listener;
 
     public EmojiTabAdapter(FragmentManager fm) {
         super(fm);
@@ -39,11 +31,7 @@ public class EmojiTabAdapter extends FragmentPagerAdapter {
     // CALLBACKS
     @Override
     public CharSequence getPageTitle(int position) {
-        if (position == 1) {
-            return "PEOPLE";
-        } else {
-            return mFragmentTitleList.get(position);
-        }
+        return mFragmentTitleList.get(position);
     }
 
     @Override
@@ -53,20 +41,23 @@ public class EmojiTabAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if (position == 1) {
-            return FRAGMENT_EMOJI_PEOPLE;
-        } else {
-            return mFragmentList.get(position);
-        }
+        FragmentEmoji f = mFragmentList.get(position);
+        f.setEmojiconClickListener(listener);
+
+        return f;
     }
 
     public void setOnEmojiClickListener(OnEmojiClickListener listener) {
-        Log.d("TAB_ADAPTER", "SET CLICK LISTENER" + listener.toString());
+        if (this.listener == null)
+            this.listener = listener;
+    }
 
-        //for (FragmentEmoji f : mFragmentList) {
-        //    f.setEmojiconClickListener(listener);
-       // }
-
-        FRAGMENT_EMOJI_PEOPLE.setEmojiconClickListener(listener);
+    @NonNull
+    @Override
+    public Object instantiateItem(@NonNull ViewGroup container, int position) {
+        FragmentEmoji f = (FragmentEmoji) super.instantiateItem(container, position);
+        f.setEmojiconClickListener(listener);
+        mFragmentList.set(position, f);
+        return f;
     }
 }

@@ -227,7 +227,7 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
 
         final SmartTabLayout viewPagerTab = (SmartTabLayout)findViewById(R.id.emoji_tabs);
         final LayoutInflater inf = LayoutInflater.from(getContext().getApplicationContext());
-/**
+
         viewPagerTab.setCustomTabView(new SmartTabLayout.TabProvider() {
             @Override
             public View createTabView(ViewGroup container, int position, PagerAdapter adapter) {
@@ -265,6 +265,7 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
             }
         });
 
+        /**
         viewPagerTab.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

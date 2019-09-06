@@ -11,11 +11,8 @@ import androidx.annotation.NonNull;
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.adapter.EmojiAdapter;
 import ru.funnyhourse.emojilibrary.model.Objects;
-import ru.funnyhourse.emojilibrary.presenter.OnEmojiClickListener;
 
 public final class FragmentEmojiObjects extends FragmentEmoji {
-    private OnEmojiClickListener mOnEmojiconClickedListener;
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,

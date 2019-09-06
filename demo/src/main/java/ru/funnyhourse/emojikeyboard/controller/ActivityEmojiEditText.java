@@ -65,13 +65,10 @@ public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEdi
         this.setTelegramTheme();
         this.initMessageList();
 
-        if (presenter == null) {
-            presenter = EmojiEditTextPanelPresenter.newInstance(
-                    (EmojiEditTextPanel) findViewById(R.id.bottompanel),
-                    getSupportFragmentManager(),
-                    savedInstanceState);
-            presenter.setEventListener(this);
-        }
+        presenter = EmojiEditTextPanelPresenter.newInstance(
+                (EmojiEditTextPanel) findViewById(R.id.bottompanel),
+                getSupportFragmentManager());
+        presenter.setEventListener(this);
     }
 
     @Override

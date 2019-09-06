@@ -30,13 +30,11 @@ public class EmojiEditTextPanelPresenter implements IEmojiEditTextPanelPresenter
     private EmojiEditTextPanelPresenter() {}
 
     public static EmojiEditTextPanelPresenter newInstance(IEmojiEditTextPanel view,
-                                                          FragmentManager fm,
-                                                          Bundle savedInstanceState) {
+                                                          FragmentManager fm) {
         EmojiEditTextPanelPresenter presenter = new EmojiEditTextPanelPresenter();
-        presenter.setView(view);
 
-        if (savedInstanceState == null)
-            presenter.setTabAdapter(new EmojiTabAdapter(fm));
+        presenter.setView(view);
+        presenter.setTabAdapter(new EmojiTabAdapter(fm));
 
         return presenter;
     }
@@ -170,8 +168,6 @@ public class EmojiEditTextPanelPresenter implements IEmojiEditTextPanelPresenter
 
     @Override
     public void onEmojiClicked(Emoji emoji) {
-        Log.d("Presenter", emoji.toString());
-
         view.appendEmojiToText(emoji);
     }
 
@@ -212,14 +208,14 @@ public class EmojiEditTextPanelPresenter implements IEmojiEditTextPanelPresenter
 
     private void setTabAdapter(@NonNull EmojiTabAdapter tabAdapter) {
         tabAdapter.addFragment(new FragmentEmojiRecents(), "RECENTS");
-        //tabAdapter.addFragment(new FragmentEmojiPeople(), "PEOPLE");
+        tabAdapter.addFragment(new FragmentEmojiPeople(), "PEOPLE");
         tabAdapter.addFragment(new FragmentEmojiNature(), "NATURE");
         tabAdapter.addFragment(new FragmentEmojiObjects(), "OBJECTS");
         tabAdapter.addFragment(new FragmentEmojiPlaces(), "PLACES");
         tabAdapter.addFragment(new FragmentEmojiSymbols(), "SYMBOLS");
 
-        tabAdapter.setOnEmojiClickListener(this);
-
         this.view.setViewPagerAdapter(tabAdapter);
+
+        tabAdapter.setOnEmojiClickListener(this);
     }
 }
