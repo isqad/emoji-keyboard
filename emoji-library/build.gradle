@@ -7,7 +7,7 @@ Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 group = 'ru.funnyhourse.android'
-version = '1.0.0'
+version = '1.1.0'
 
 // =================================================================================================
 android {
@@ -16,7 +16,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.1.0"
         multiDexEnabled true
     }
     dexOptions {

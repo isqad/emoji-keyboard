@@ -10,7 +10,7 @@ A library to provide an emoji-keyboard implementation for Android applications
 
 ```
 dependencies {
-    compile 'ru.funnyhourse:emoji-library:1.0.0'
+    compile 'ru.funnyhourse:emoji-library:1.1.0'
 }
 ```
 
