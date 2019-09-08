@@ -1,4 +1,4 @@
-package ru.funnyhourse.emojilibrary.presenter;
+package ru.funnyhourse.emojilibrary.view;
 
 import ru.funnyhourse.emojilibrary.model.Emoji;
 

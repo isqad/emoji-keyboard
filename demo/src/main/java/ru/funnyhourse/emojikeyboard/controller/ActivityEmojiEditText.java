@@ -29,12 +29,11 @@ import ru.funnyhourse.emojikeyboard.adapter.MessageAdapter;
 import ru.funnyhourse.emojikeyboard.model.Message;
 import ru.funnyhourse.emojikeyboard.model.MessageType;
 import ru.funnyhourse.emojikeyboard.util.TimestampUtil;
-import ru.funnyhourse.emojilibrary.presenter.EmojiEditTextPanelPresenter;
 import ru.funnyhourse.emojilibrary.view.EmojiEditTextPanel;
-import ru.funnyhourse.emojilibrary.view.EmojiEditTextPanelEventListener;
 import ru.funnyhourse.emojilibrary.view.IOnBackPressedListener;
+import ru.funnyhourse.emojilibrary.view.OnEmojiNavigationClickListener;
 
-public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEditTextPanelEventListener {
+public class ActivityEmojiEditText extends AppCompatActivity implements OnEmojiNavigationClickListener {
 
     public static final String TAG = "ActivityEmojiEditText";
 
@@ -46,7 +45,7 @@ public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEdi
     private RecyclerView mMessages;
     private MessageAdapter mAdapter;
 
-    private EmojiEditTextPanelPresenter presenter;
+    private EmojiEditTextPanel editTextPanel;
 
     // CALLBACKS
     @Override
@@ -59,9 +58,11 @@ public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEdi
         this.setTelegramTheme();
         this.initMessageList();
 
-        EmojiEditTextPanel editTextPanel = (EmojiEditTextPanel) findViewById(R.id.bottompanel);
-        presenter = EmojiEditTextPanelPresenter.newInstance(editTextPanel, getSupportFragmentManager());
-        presenter.setEventListener(this);
+        editTextPanel = (EmojiEditTextPanel) findViewById(R.id.bottompanel);
+        editTextPanel.setOnEmojiNavigationClickListener(this);
+
+        //presenter = EmojiEditTextPanelPresenter.newInstance(editTextPanel, getSupportFragmentManager());
+        //presenter.setEventListener(this);
     }
 
     @Override
@@ -179,8 +180,8 @@ public class ActivityEmojiEditText extends AppCompatActivity implements EmojiEdi
         message.setType(MessageType.OUTGOING);
         message.setTimestamp(TimestampUtil.getCurrentTimestamp());
 
-        message.setContent(presenter.getText());
-        presenter.clearText();
+        message.setContent(editTextPanel.getInputText().toString());
+        editTextPanel.setInputText("");
 
         this.updateMessageList(message);
         this.echoMessage(message);

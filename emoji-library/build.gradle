@@ -70,10 +70,8 @@ bintray {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'com.google.android.material:material:1.1.0-alpha07'
-
-    implementation 'com.ogaclejapan.smarttablayout:library:2.0.0@aar'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.android.material:material:1.1.0-alpha10'
 
     implementation 'com.github.satyan:sugar:1.5'
 

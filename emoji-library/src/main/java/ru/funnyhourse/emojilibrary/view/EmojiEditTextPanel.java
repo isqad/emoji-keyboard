@@ -3,44 +3,35 @@ package ru.funnyhourse.emojilibrary.view;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
-import com.ogaclejapan.smarttablayout.SmartTabLayout;
-
 import ru.funnyhourse.emojilibrary.R;
-import ru.funnyhourse.emojilibrary.adapter.EmojiTabAdapter;
 import ru.funnyhourse.emojilibrary.model.Emoji;
-import ru.funnyhourse.emojilibrary.presenter.IEmojiEditTextPanelPresenter;
 
-public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPanel {
-    private Toolbar mBottomPanel;
+public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPanel, OnEmojiClickListener {
+    private Toolbar toolbar;
 
     private EmojiEditText mInput;
 
     private Boolean mToogleIcon = Boolean.TRUE;
 
-    private RelativeLayout mEmojiKeyboardLayout;
-
-    private IEmojiEditTextPanelPresenter presenter;
+    private EmojiKeyboardView mEmojiKeyboardLayout;
 
     private ImageView[] mTabIcons = new ImageView[6];
+
+    private boolean isEmojiKeyboardVisible = false;
+
+    private OnEmojiNavigationClickListener navListener;
 
     public EmojiEditTextPanel(Context context) {
         super(context);
@@ -64,38 +55,84 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
         init(context);
     }
 
-    // INITIALIZATIONS
     private void init(@NonNull Context context) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (inflater != null)
-            inflater.inflate(R.layout.edit_panel, this, true);
+        View.inflate(context, R.layout.edit_panel, this);
 
-        mBottomPanel = (Toolbar)findViewById(R.id.panel);
-        mInput = (EmojiEditText)mBottomPanel.findViewById(R.id.input);
-        mEmojiKeyboardLayout = (RelativeLayout) findViewById(R.id.emoji_keyboard);
+        mEmojiKeyboardLayout = (EmojiKeyboardView)findViewById(R.id.emoji_keyboard_view);
+        mEmojiKeyboardLayout.setClickListener(this);
+
+        toolbar = (Toolbar)findViewById(R.id.panel);
+        toolbar.setNavigationIcon(R.drawable.input_emoji);
+        toolbar.setTitleTextColor(0xFFFFFFFF);
+        toolbar.inflateMenu(R.menu.toolbar);
+
+        mInput = (EmojiEditText)findViewById(R.id.input);
+        configureInput();
+        initBottomPanel();
+    }
+
+    public void setOnEmojiNavigationClickListener(@NonNull OnEmojiNavigationClickListener listener) {
+        navListener = listener;
     }
 
     @Override
-    public void setPresenter(IEmojiEditTextPanelPresenter presenter) {
-        this.presenter = presenter;
+    public void onEmojiClicked(Emoji emojicon) {
+        appendEmojiToText(emojicon);
     }
 
     @Override
     public void initBottomPanel() {
-        mBottomPanel.setNavigationIcon(R.drawable.input_emoji);
-        mBottomPanel.setTitleTextColor(0xFFFFFFFF);
-        mBottomPanel.inflateMenu(R.menu.telegram_menu);
-
-        mBottomPanel.setNavigationOnClickListener(new View.OnClickListener() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onBottomPanelNavigationClick();
+                if (isEmojiKeyboardVisible) {
+                    isEmojiKeyboardVisible = false;
+
+                    boolean isShow = showSoftKeyboard(new ResultReceiver(null) {
+                        @Override
+                        protected void onReceiveResult(int resultCode, Bundle resultData) {
+                            hideEmojiKeyboard();
+                        }
+                    });
+
+                    if (!isShow) {
+                        hideEmojiKeyboard();
+                    }
+
+                    showEmojiIcon();
+                } else {
+                    isEmojiKeyboardVisible = true;
+
+                    boolean isHide = hideSoftKeyboard(new ResultReceiver(null) {
+                        @Override
+                        protected void onReceiveResult(int resultCode, Bundle resultData) {
+                            showEmojiKeyboard();
+                        }
+                    });
+
+                    // Already hidden
+                    if (!isHide) {
+                        showEmojiKeyboard();
+                    }
+
+                    showKeyboardIcon();
+                }
             }
         });
-        mBottomPanel.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                return presenter.onBottomPanelMenuItemClick(item);
+                if (item.getItemId() == R.id.action_attach) {
+                    navListener.onAttachClicked();
+                } else if (item.getItemId() == R.id.action_mic) {
+                    if (getInputText().toString().equals("")) {
+                        navListener.onMicClicked();
+                    } else {
+                        navListener.onSendClicked();
+                    }
+                }
+                return true;
             }
         });
     }
@@ -117,12 +154,12 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
 
     @Override
     public void showEmojiIcon() {
-        mBottomPanel.setNavigationIcon(R.drawable.input_emoji);
+        toolbar.setNavigationIcon(R.drawable.input_emoji);
     }
 
     @Override
     public void showKeyboardIcon() {
-        mBottomPanel.setNavigationIcon(R.drawable.ic_keyboard_grey600_24dp);
+        toolbar.setNavigationIcon(R.drawable.ic_keyboard_grey600_24dp);
     }
 
     @Override
@@ -132,21 +169,9 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
 
     @Override
     public void configureInput() {
-        final MenuItem micButton = mBottomPanel.getMenu().findItem(R.id.action_mic);
-        final View iconAttach = mBottomPanel.findViewById(R.id.action_attach);
-        final View iconMic = mBottomPanel.findViewById(R.id.action_mic);
-
-        mInput.addOnSoftKeyboardListener(new EmojiEditText.OnSoftKeyboardListener() {
-            @Override
-            public void onSoftKeyboardDisplay() {
-                presenter.onSoftKeyboardDisplay();
-            }
-
-            @Override
-            public void onSoftKeyboardHidden() {
-                presenter.onSoftKeyboardHidden();
-            }
-        });
+        final MenuItem micButton = toolbar.getMenu().findItem(R.id.action_mic);
+        final View iconAttach = toolbar.findViewById(R.id.action_attach);
+        final View iconMic = toolbar.findViewById(R.id.action_mic);
 
         mInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -201,8 +226,7 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
         mEmojiKeyboardLayout.setVisibility(LinearLayout.GONE);
     }
 
-    @Override
-    public void appendEmojiToText(Emoji emoji) {
+    private void appendEmojiToText(@NonNull Emoji emoji) {
         int start = mInput.getSelectionStart();
         int end = mInput.getSelectionEnd();
         String emojiSymbol = emoji.getEmoji();
@@ -221,130 +245,34 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
     }
 
     @Override
-    public void setViewPagerAdapter(EmojiTabAdapter adapter) {
-        final ViewPager viewPager = (ViewPager)findViewById(R.id.emoji_viewpager);
-        viewPager.setAdapter(adapter);
-
-        final SmartTabLayout viewPagerTab = (SmartTabLayout)findViewById(R.id.emoji_tabs);
-        final LayoutInflater inf = LayoutInflater.from(getContext().getApplicationContext());
-
-        viewPagerTab.setCustomTabView(new SmartTabLayout.TabProvider() {
-            @Override
-            public View createTabView(ViewGroup container, int position, PagerAdapter adapter) {
-                ImageView icon = (ImageView) inf.inflate(R.layout.rsc_emoji_tab_icon_view, container, false);
-                switch (position) {
-                    case 0:
-                        mTabIcons[0] = icon;
-                        icon.setImageResource(R.drawable.ic_emoji_recent_light_normal);
-                        break;
-                    case 1:
-                        mTabIcons[1] = icon;
-                        icon.setImageResource(R.drawable.ic_emoji_people_light_normal);
-                        break;
-                    case 2:
-                        mTabIcons[2] = icon;
-                        icon.setImageResource(R.drawable.ic_emoji_nature_light_normal);
-                        break;
-                    case 3:
-                        mTabIcons[3] = icon;
-                        icon.setImageResource(R.drawable.ic_emoji_objects_light_normal);
-                        break;
-                    case 4:
-                        mTabIcons[4] = icon;
-                        icon.setImageResource(R.drawable.ic_emoji_places_light_normal);
-                        break;
-                    case 5:
-                        mTabIcons[5] = icon;
-                        icon.setImageResource(R.drawable.ic_emoji_symbols_light_normal);
-                        break;
-                    case 6:
-                        icon.setImageResource(R.drawable.sym_keyboard_delete_holo_dark);
-                        break;
-                }
-                return icon;
-            }
-        });
-
-        /**
-        viewPagerTab.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                switch (position) {
-                    case 0:
-                        // adapter.updateRecentEmojis();
-                        mTabIcons[0].setImageResource(R.drawable.ic_emoji_recent_light_activated);
-                        mTabIcons[1].setImageResource(R.drawable.ic_emoji_people_light_normal);
-                        mTabIcons[2].setImageResource(R.drawable.ic_emoji_nature_light_normal);
-                        mTabIcons[3].setImageResource(R.drawable.ic_emoji_objects_light_normal);
-                        mTabIcons[4].setImageResource(R.drawable.ic_emoji_places_light_normal);
-                        mTabIcons[5].setImageResource(R.drawable.ic_emoji_symbols_light_normal);
-                        break;
-                    case 1:
-                        mTabIcons[0].setImageResource(R.drawable.ic_emoji_recent_light_normal);
-                        mTabIcons[1].setImageResource(R.drawable.ic_emoji_people_light_activated);
-                        mTabIcons[2].setImageResource(R.drawable.ic_emoji_nature_light_normal);
-                        mTabIcons[3].setImageResource(R.drawable.ic_emoji_objects_light_normal);
-                        mTabIcons[4].setImageResource(R.drawable.ic_emoji_places_light_normal);
-                        mTabIcons[5].setImageResource(R.drawable.ic_emoji_symbols_light_normal);
-                        break;
-                    case 2:
-                        mTabIcons[0].setImageResource(R.drawable.ic_emoji_recent_light_normal);
-                        mTabIcons[1].setImageResource(R.drawable.ic_emoji_people_light_normal);
-                        mTabIcons[2].setImageResource(R.drawable.ic_emoji_nature_light_activated);
-                        mTabIcons[3].setImageResource(R.drawable.ic_emoji_objects_light_normal);
-                        mTabIcons[4].setImageResource(R.drawable.ic_emoji_places_light_normal);
-                        mTabIcons[5].setImageResource(R.drawable.ic_emoji_symbols_light_normal);
-                        break;
-                    case 3:
-                        mTabIcons[0].setImageResource(R.drawable.ic_emoji_recent_light_normal);
-                        mTabIcons[1].setImageResource(R.drawable.ic_emoji_people_light_normal);
-                        mTabIcons[2].setImageResource(R.drawable.ic_emoji_nature_light_normal);
-                        mTabIcons[3].setImageResource(R.drawable.ic_emoji_objects_light_activated);
-                        mTabIcons[4].setImageResource(R.drawable.ic_emoji_places_light_normal);
-                        mTabIcons[5].setImageResource(R.drawable.ic_emoji_symbols_light_normal);
-                        break;
-                    case 4:
-                        mTabIcons[0].setImageResource(R.drawable.ic_emoji_recent_light_normal);
-                        mTabIcons[1].setImageResource(R.drawable.ic_emoji_people_light_normal);
-                        mTabIcons[2].setImageResource(R.drawable.ic_emoji_nature_light_normal);
-                        mTabIcons[3].setImageResource(R.drawable.ic_emoji_objects_light_normal);
-                        mTabIcons[4].setImageResource(R.drawable.ic_emoji_places_light_activated);
-                        mTabIcons[5].setImageResource(R.drawable.ic_emoji_symbols_light_normal);
-                        break;
-                    case 5:
-                        mTabIcons[0].setImageResource(R.drawable.ic_emoji_recent_light_normal);
-                        mTabIcons[1].setImageResource(R.drawable.ic_emoji_people_light_normal);
-                        mTabIcons[2].setImageResource(R.drawable.ic_emoji_nature_light_normal);
-                        mTabIcons[3].setImageResource(R.drawable.ic_emoji_objects_light_normal);
-                        mTabIcons[4].setImageResource(R.drawable.ic_emoji_places_light_normal);
-                        mTabIcons[5].setImageResource(R.drawable.ic_emoji_symbols_light_activated);
-                        break;
-                }
-            }
-
-            @Override
-            public void onPageSelected(int position) {}
-
-            @Override
-            public void onPageScrollStateChanged(int state) {}
-        });
- **/
-        viewPagerTab.setViewPager(viewPager);
-    }
-
-    @Override
     public void setBackspaceBehaviour() {
-        ImageView mBackspace = (ImageView)findViewById(R.id.backspace);
-        mBackspace.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mInput.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
-            }
-        });
+        //ImageView mBackspace = (ImageView)findViewById(R.id.backspace);
+        //mBackspace.setOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View v) {
+        //        mInput.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+        //    }
+        //});
     }
 
     @Override
     public void setInputText(String text) {
         mInput.setText(text);
     }
+
+    /**
+     private void setOnBackPressed() {
+     ((IEmojiActivity)this.mActivity).setOnBackPressed(new IOnBackPressedListener() {
+    @Override
+    public Boolean onBackPressed() {
+    if (isEmojiKeyboardVisible) {
+    isEmojiKeyboardVisible = Boolean.FALSE;
+    hideEmojiKeyboard(0);
+    return Boolean.TRUE;
+    }
+    return Boolean.FALSE;
+    }
+    });
+     }
+     **/
 }

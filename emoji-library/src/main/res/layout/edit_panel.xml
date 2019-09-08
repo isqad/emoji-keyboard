@@ -27,8 +27,14 @@
             android:textSize="18sp"
             android:theme="@style/TelegramEditText"
             app:emojiSize="25dip"/>
-
     </androidx.appcompat.widget.Toolbar>
 
-    <include layout="@layout/rsc_emoji_keyboard"/>
+    <ru.funnyhourse.emojilibrary.view.EmojiKeyboardView
+        android:id="@+id/emoji_keyboard_view"
+        android:background="@color/rsc_emoji_layout_bkg"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        android:layout_height="@dimen/dim_emoji_keyboard_size"
+        android:orientation="vertical"
+        android:layout_width="match_parent" />
 </com.google.android.material.appbar.AppBarLayout>

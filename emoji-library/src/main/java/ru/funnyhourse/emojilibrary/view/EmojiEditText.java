@@ -15,6 +15,9 @@ import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.util.EmojiUtil;
 import ru.funnyhourse.emojilibrary.util.SoftKeyboardUtil;
 
+/**
+ * Edit text field for input text
+ */
 public class EmojiEditText extends AppCompatEditText {
     private Context mContext;
     private OnSoftKeyboardListener mOnSoftKeyboardListener;

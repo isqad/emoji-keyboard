@@ -3,10 +3,13 @@ package ru.funnyhourse.emojilibrary.util;
 import android.content.Context;
 import android.text.Spannable;
 import android.util.SparseIntArray;
+import android.util.TypedValue;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.view.EmojiSpan;
 import ru.funnyhourse.emojilibrary.model.Nature;
@@ -254,5 +257,23 @@ public final class EmojiUtil {
                 break;
         }
         return icon;
+    }
+
+    public static int resolveColor(@NonNull final Context context, final int resource, final int fallback) {
+        final TypedValue value = new TypedValue();
+        context.getTheme().resolveAttribute(resource, value, true);
+        final int resolvedColor;
+
+        if (value.resourceId != 0) {
+            resolvedColor = ContextCompat.getColor(context, value.resourceId);
+        } else {
+            resolvedColor = value.data;
+        }
+
+        if (resolvedColor != 0) {
+            return resolvedColor;
+        } else {
+            return ContextCompat.getColor(context, fallback);
+        }
     }
 }

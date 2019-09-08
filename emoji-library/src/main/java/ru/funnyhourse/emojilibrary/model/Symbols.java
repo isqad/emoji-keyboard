@@ -4,10 +4,7 @@ import android.util.SparseIntArray;
 
 import ru.funnyhourse.emojilibrary.R;
 
-/**
- * Created by Leonardo Assunção on 18/02/2016.
- */
-public class Symbols {
+public final class Symbols implements EmojiCategory {
     public static final Emoji[] DATA = new Emoji[]{
             Emoji.fromString("\u0031\u20e3"),
             Emoji.fromString("\u0032\u20e3"),
@@ -219,6 +216,16 @@ public class Symbols {
             Emoji.fromCodePoint(0x1f538),
             Emoji.fromCodePoint(0x1f539),
     };
+
+    @Override
+    public int getIcon() {
+        return R.drawable.ic_emoji_symbols_light_normal;
+    }
+
+    @Override
+    public Emoji[] getEmojis() {
+        return DATA;
+    }
 
     public static void bindEmojis(SparseIntArray map) {
         map.put(0x1f51f, R.drawable.emoji_1f51f);

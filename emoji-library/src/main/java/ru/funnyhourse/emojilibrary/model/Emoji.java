@@ -1,7 +1,7 @@
 package ru.funnyhourse.emojilibrary.model;
 
 public class Emoji {
-    private String emoji;
+    private String emoji = "";
 
     private Emoji() {}
 

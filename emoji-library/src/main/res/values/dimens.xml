@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="dim_emoji_keyboard_size">255dip</dimen>
+    <dimen name="emoji_grid_view_column_width">50dip</dimen>
 </resources>

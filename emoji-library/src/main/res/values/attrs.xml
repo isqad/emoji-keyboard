@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="emojiIcons" format="color|reference"/>
+
     <declare-styleable name="Emoji">
         <attr name="emojiSize" format="dimension"/>
         <attr name="emojiAlignment" format="enum">

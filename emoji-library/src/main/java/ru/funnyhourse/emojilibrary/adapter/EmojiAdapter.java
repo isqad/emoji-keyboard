@@ -5,48 +5,46 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-import java.util.List;
-
+import androidx.annotation.NonNull;
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.model.Emoji;
+import ru.funnyhourse.emojilibrary.view.OnEmojiClickListener;
 import ru.funnyhourse.emojilibrary.view.EmojiTextView;
 
-public class EmojiAdapter extends ArrayAdapter<Emoji> {
+/**
+ * Adapter for EmojiGridView
+ */
+public final class EmojiAdapter extends ArrayAdapter<Emoji> {
+    private final static String TAG = "EmojiAdapter";
 
-    private boolean mUseSystemDefault = Boolean.FALSE;
+    private OnEmojiClickListener listener;
 
-    // CONSTRUCTOR
-    public EmojiAdapter(Context context, Emoji[] data) {
+    public EmojiAdapter(Context context, Emoji[] data, @NonNull OnEmojiClickListener listener) {
         super(context, R.layout.rsc_emoji_item, data);
-    }
 
-    public EmojiAdapter(Context context, List<Emoji> data) {
-        super(context, R.layout.rsc_emoji_item, data);
-    }
-
-    public EmojiAdapter(Context context, List<Emoji> data, boolean useSystemDefault) {
-        super(context, R.layout.rsc_emoji_item, data);
-        this.mUseSystemDefault = useSystemDefault;
-    }
-
-    public EmojiAdapter(Context context, Emoji[] data, boolean useSystemDefault) {
-        super(context, R.layout.rsc_emoji_item, data);
-        this.mUseSystemDefault = useSystemDefault;
+        this.listener = listener;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
 
+        final Emoji emoji = getItem(position);
         if (view == null) {
             view = View.inflate(getContext(), R.layout.rsc_emoji_item, null);
-            view.setTag(new ViewHolder(view, this.mUseSystemDefault));
+            view.setTag(new ViewHolder(view, false));
         }
 
-        if (null != getItem(position)) {
-            Emoji emoji = this.getItem(position);
+        if (emoji != null) {
             ViewHolder holder = (ViewHolder) view.getTag();
             holder.icon.setText(emoji.getEmoji());
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onEmojiClicked(emoji);
+                }
+            });
         }
 
         return view;
@@ -55,9 +53,8 @@ public class EmojiAdapter extends ArrayAdapter<Emoji> {
     static class ViewHolder {
         EmojiTextView icon;
 
-        public ViewHolder(View view, Boolean useSystemDefault) {
-            this.icon = (EmojiTextView) view.findViewById(R.id.emoji_icon);
-            this.icon.setUseSystemDefault(useSystemDefault);
+        public ViewHolder(@NonNull View view, Boolean useSystemDefault) {
+            icon = (EmojiTextView)view.findViewById(R.id.emoji_icon);
         }
     }
 }

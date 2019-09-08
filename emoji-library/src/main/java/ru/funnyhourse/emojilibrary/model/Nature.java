@@ -4,10 +4,7 @@ import android.util.SparseIntArray;
 
 import ru.funnyhourse.emojilibrary.R;
 
-/**
- * Created by Leonardo Assunção on 18/02/2016.
- */
-public class Nature {
+public final class Nature implements EmojiCategory {
     public static final Emoji[] DATA = new Emoji[]{
             Emoji.fromCodePoint(0x1f436),
             Emoji.fromCodePoint(0x1f43a),
@@ -126,6 +123,16 @@ public class Nature {
             Emoji.fromCodePoint(0x1f308),
             Emoji.fromCodePoint(0x1f30a),
     };
+
+    @Override
+    public int getIcon() {
+        return R.drawable.ic_emoji_nature_light_normal;
+    }
+
+    @Override
+    public Emoji[] getEmojis() {
+        return DATA;
+    }
 
     public static void bindEmojis(SparseIntArray map) {
         map.put(0x1f436, R.drawable.emoji_1f436);

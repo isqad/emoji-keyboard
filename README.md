@@ -24,18 +24,19 @@ Then add to your layout:
                 android:layout_alignParentBottom="true"/>
 ```
 
-Initialize presenter in your activity/fragment:
+Initialize in your activity/fragment:
 
 ```java
-public class SmartChatActivity extends AppCompatActivity implements EmojiEditTextPanelEventListener {
+public class SmartChatActivity extends AppCompatActivity implements OnEmojiNavigationClickListener {
+    private EmojiEditTextPanel editTextPanel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.smartchat);
 
-        EmojiEditTextPanel editTextPanel = (EmojiEditTextPanel) findViewById(R.id.bottompanel);
-        presenter = EmojiEditTextPanelPresenter.newInstance(editTextPanel, getSupportFragmentManager());
-        presenter.setEventListener(this);
+        editTextPanel = (EmojiEditTextPanel) findViewById(R.id.bottompanel);
+        editTextPanel.setOnEmojiNavigationClickListener(this);
     }
 
     @Override

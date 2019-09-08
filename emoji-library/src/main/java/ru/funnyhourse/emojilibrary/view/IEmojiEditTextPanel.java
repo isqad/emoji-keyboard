@@ -3,9 +3,6 @@ package ru.funnyhourse.emojilibrary.view;
 import android.os.ResultReceiver;
 import android.text.Editable;
 
-import ru.funnyhourse.emojilibrary.adapter.EmojiTabAdapter;
-import ru.funnyhourse.emojilibrary.model.Emoji;
-import ru.funnyhourse.emojilibrary.presenter.IEmojiEditTextPanelPresenter;
 
 public interface IEmojiEditTextPanel {
     void initBottomPanel();
@@ -23,12 +20,6 @@ public interface IEmojiEditTextPanel {
     Editable getInputText();
 
     void configureInput();
-
-    void setPresenter(IEmojiEditTextPanelPresenter presenter);
-
-    void appendEmojiToText(Emoji emoji);
-
-    void setViewPagerAdapter(EmojiTabAdapter adapter);
 
     void setBackspaceBehaviour();
 
