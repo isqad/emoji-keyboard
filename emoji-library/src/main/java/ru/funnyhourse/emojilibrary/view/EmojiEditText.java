@@ -2,9 +2,12 @@ package ru.funnyhourse.emojilibrary.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.ResultReceiver;
+import android.text.InputType;
 import android.text.style.DynamicDrawableSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -15,13 +18,10 @@ import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.util.EmojiUtil;
 import ru.funnyhourse.emojilibrary.util.SoftKeyboardUtil;
 
-/**
- * Edit text field for input text
- */
 public class EmojiEditText extends AppCompatEditText {
     private Context mContext;
     private OnSoftKeyboardListener mOnSoftKeyboardListener;
-    private Boolean isSoftKeyboardVisible = Boolean.FALSE;
+    private boolean isSoftKeyboardVisible = false;
 
     private int mEmojiconSize;
     private int mEmojiconAlignment;
@@ -46,26 +46,44 @@ public class EmojiEditText extends AppCompatEditText {
 
     // INITIALIZATIONS
     private void init(Context context, AttributeSet attrs) {
-        this.mContext = context;
-        this.initFocusListener();
+        mContext = context;
+        disableShowSoftInputOnFocus();
+
+        initFocusListener();
+
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.Emoji);
-        this.mEmojiconSize = (int) a.getDimension(R.styleable.Emoji_emojiSize, getTextSize());
-        this.mEmojiconAlignment = a.getInt(R.styleable.Emoji_emojiAlignment, DynamicDrawableSpan.ALIGN_BASELINE);
-        this.mUseSystemDefault = a.getBoolean(R.styleable.Emoji_emojiUseSystemDefault, false);
+        mEmojiconSize = (int) a.getDimension(R.styleable.Emoji_emojiSize, getTextSize());
+        mEmojiconAlignment = a.getInt(R.styleable.Emoji_emojiAlignment, DynamicDrawableSpan.ALIGN_BASELINE);
+        mUseSystemDefault = a.getBoolean(R.styleable.Emoji_emojiUseSystemDefault, false);
         a.recycle();
-        this.mEmojiconTextSize = (int) getTextSize();
+        mEmojiconTextSize = (int) getTextSize();
         setText(getText());
     }
 
+    private void disableShowSoftInputOnFocus() {
+        if (Build.VERSION.SDK_INT >= 19) {
+            setShowSoftInputOnFocus(false);
+        } else {
+            setRawInputType(InputType.TYPE_NULL);
+            setFocusable(false);
+        }
+    }
+
     private void initFocusListener() {
-        this.setOnFocusChangeListener(new OnFocusChangeListener() {
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnSoftKeyboardListener != null)
+                    mOnSoftKeyboardListener.onSoftKeyboardFocus();
+            }
+        });
+
+        setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    if (mOnSoftKeyboardListener != null) {
-                        isSoftKeyboardVisible = Boolean.TRUE;
-                        mOnSoftKeyboardListener.onSoftKeyboardDisplay();
-                    }
+                    if (mOnSoftKeyboardListener != null)
+                        mOnSoftKeyboardListener.onSoftKeyboardFocus();
                 }
             }
         });
@@ -75,14 +93,9 @@ public class EmojiEditText extends AppCompatEditText {
     @Override
     public boolean onKeyPreIme(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            InputMethodManager mgr = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-            mgr.hideSoftInputFromWindow(this.getWindowToken(), 0);
-
-            if (this.mOnSoftKeyboardListener != null) {
-                this.clearFocus();
-                EmojiEditText.this.isSoftKeyboardVisible = Boolean.FALSE;
-                this.mOnSoftKeyboardListener.onSoftKeyboardHidden();
-            }
+            if (mOnSoftKeyboardListener != null)
+                mOnSoftKeyboardListener.onSoftKeyboardBackPressed();
+            clearFocus();
         }
         return true;
     }
@@ -114,15 +127,12 @@ public class EmojiEditText extends AppCompatEditText {
     public boolean hideSoftKeyboard(ResultReceiver resultReceiver) {
         isSoftKeyboardVisible = false;
 
-        clearFocus();
-
         return SoftKeyboardUtil.dismissSoftKeyboard(this.mContext, this, resultReceiver);
     }
 
     public interface OnSoftKeyboardListener {
-        void onSoftKeyboardDisplay();
-
-        void onSoftKeyboardHidden();
+        void onSoftKeyboardFocus();
+        void onSoftKeyboardBackPressed();
     }
 
     // GETTERS AND SETTERS

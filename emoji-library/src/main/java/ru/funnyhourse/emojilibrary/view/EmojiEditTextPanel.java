@@ -8,9 +8,9 @@ import android.os.ResultReceiver;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -18,18 +18,17 @@ import androidx.appcompat.widget.Toolbar;
 import ru.funnyhourse.emojilibrary.R;
 import ru.funnyhourse.emojilibrary.model.Emoji;
 
-public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPanel, OnEmojiClickListener {
+public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPanel, OnEmojiClickListener, EmojiEditText.OnSoftKeyboardListener {
     private Toolbar toolbar;
 
     private EmojiEditText mInput;
 
-    private Boolean mToogleIcon = Boolean.TRUE;
+    private boolean mToogleIcon = true;
 
     private EmojiKeyboardView mEmojiKeyboardLayout;
 
-    private ImageView[] mTabIcons = new ImageView[6];
-
     private boolean isEmojiKeyboardVisible = false;
+    private boolean isSoftKeyboardVisible = false;
 
     private OnEmojiNavigationClickListener navListener;
 
@@ -67,6 +66,8 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
         toolbar.inflateMenu(R.menu.toolbar);
 
         mInput = (EmojiEditText)findViewById(R.id.input);
+        mInput.addOnSoftKeyboardListener(this);
+
         configureInput();
         initBottomPanel();
     }
@@ -86,37 +87,11 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
             @Override
             public void onClick(View v) {
                 if (isEmojiKeyboardVisible) {
-                    isEmojiKeyboardVisible = false;
-
-                    boolean isShow = showSoftKeyboard(new ResultReceiver(null) {
-                        @Override
-                        protected void onReceiveResult(int resultCode, Bundle resultData) {
-                            hideEmojiKeyboard();
-                        }
-                    });
-
-                    if (!isShow) {
-                        hideEmojiKeyboard();
-                    }
-
-                    showEmojiIcon();
+                    switchEmojiKeyboardToSoftKeyboard();
                 } else {
-                    isEmojiKeyboardVisible = true;
-
-                    boolean isHide = hideSoftKeyboard(new ResultReceiver(null) {
-                        @Override
-                        protected void onReceiveResult(int resultCode, Bundle resultData) {
-                            showEmojiKeyboard();
-                        }
-                    });
-
-                    // Already hidden
-                    if (!isHide) {
-                        showEmojiKeyboard();
-                    }
-
-                    showKeyboardIcon();
+                    switchSoftKeyboardToEmojiKeyboard();
                 }
+                mInput.requestFocus();
             }
         });
 
@@ -142,13 +117,19 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
         return mInput.isSoftKeyboardVisible();
     }
 
+    public boolean isKeyboardsVisible() {
+        return isEmojiKeyboardVisible || isSoftKeyboardVisible;
+    }
+
     @Override
     public boolean hideSoftKeyboard(ResultReceiver resultReceiver) {
+        isSoftKeyboardVisible = false;
         return mInput.hideSoftKeyboard(resultReceiver);
     }
 
     @Override
     public boolean showSoftKeyboard(ResultReceiver resultReceiver) {
+        isSoftKeyboardVisible = true;
         return mInput.showSoftKeyboard(resultReceiver);
     }
 
@@ -180,10 +161,14 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!getInputText().toString().equals("") && mToogleIcon) {
-                    mToogleIcon = Boolean.FALSE;
+                    mToogleIcon = false;
 
-                    iconAttach.animate().scaleX(0).scaleY(0).setDuration(150).start();
-                    iconAttach.setVisibility(View.GONE);
+                    iconAttach.animate().scaleX(0).scaleY(0).setDuration(150).withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            iconAttach.setVisibility(View.GONE);
+                        }
+                    }).start();
 
                     iconMic.animate().scaleX(0).scaleY(0).setDuration(75).withEndAction(
                             new Runnable() {
@@ -195,10 +180,14 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
                             }).start();
 
                 } else if (getInputText().toString().equals("")) {
-                    mToogleIcon = Boolean.TRUE;
+                    mToogleIcon = true;
 
-                    iconAttach.setVisibility(View.VISIBLE);
-                    iconAttach.animate().scaleX(1).scaleY(1).setDuration(150).start();
+                    iconAttach.animate().scaleX(1).scaleY(1).setDuration(150).withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            iconAttach.setVisibility(View.VISIBLE);
+                        }
+                    }).start();
 
                     iconMic.animate().scaleX(0).scaleY(0).setDuration(75).withEndAction(
                             new Runnable() {
@@ -218,11 +207,14 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
 
     @Override
     public void showEmojiKeyboard() {
+        isEmojiKeyboardVisible = true;
+
         mEmojiKeyboardLayout.setVisibility(LinearLayout.VISIBLE);
     }
 
     @Override
     public void hideEmojiKeyboard() {
+        isEmojiKeyboardVisible = false;
         mEmojiKeyboardLayout.setVisibility(LinearLayout.GONE);
     }
 
@@ -244,6 +236,43 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
         }
     }
 
+    private void switchEmojiKeyboardToSoftKeyboard() {
+        if (!isEmojiKeyboardVisible)
+            return;
+
+        boolean isShow = showSoftKeyboard(new ResultReceiver(null) {
+            @Override
+            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                hideEmojiKeyboard();
+            }
+        });
+
+        if (!isShow) {
+            hideEmojiKeyboard();
+        }
+
+        showEmojiIcon();
+    }
+
+    private void switchSoftKeyboardToEmojiKeyboard() {
+        if (isEmojiKeyboardVisible)
+            return;
+
+        boolean isHide = hideSoftKeyboard(new ResultReceiver(null) {
+            @Override
+            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                showEmojiKeyboard();
+            }
+        });
+
+        // Already hidden
+        if (!isHide) {
+            showEmojiKeyboard();
+        }
+
+        showKeyboardIcon();
+    }
+
     @Override
     public void setBackspaceBehaviour() {
         //ImageView mBackspace = (ImageView)findViewById(R.id.backspace);
@@ -260,19 +289,40 @@ public class EmojiEditTextPanel extends LinearLayout implements IEmojiEditTextPa
         mInput.setText(text);
     }
 
-    /**
-     private void setOnBackPressed() {
-     ((IEmojiActivity)this.mActivity).setOnBackPressed(new IOnBackPressedListener() {
+    public void hideKeyboards() {
+        if (isEmojiKeyboardVisible) {
+            hideEmojiKeyboard();
+        }
+
+        if (isSoftKeyboardVisible) {
+            hideSoftKeyboard(new ResultReceiver(null) {
+                @Override
+                protected void onReceiveResult(int resultCode, Bundle resultData) {}
+            });
+        }
+
+        showEmojiIcon();
+
+        mInput.clearFocus();
+    }
+
     @Override
-    public Boolean onBackPressed() {
-    if (isEmojiKeyboardVisible) {
-    isEmojiKeyboardVisible = Boolean.FALSE;
-    hideEmojiKeyboard(0);
-    return Boolean.TRUE;
+    public void onSoftKeyboardBackPressed() {
+        hideKeyboards();
     }
-    return Boolean.FALSE;
+
+    /**
+     * Callback when edit text focused or clicked
+     */
+    @Override
+    public void onSoftKeyboardFocus() {
+        Log.d("INN", isEmojiKeyboardVisible + ":" + isSoftKeyboardVisible);
+        if (isKeyboardsVisible()) {
+            return;
+        }
+        showSoftKeyboard(new ResultReceiver(null) {
+            @Override
+            protected void onReceiveResult(int resultCode, Bundle resultData) {}
+        });
     }
-    });
-     }
-     **/
 }

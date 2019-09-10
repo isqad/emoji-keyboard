@@ -13,7 +13,6 @@ public class SoftKeyboardUtil {
 
         if (imm != null) {
             isHide = imm.hideSoftInputFromWindow(editText.getWindowToken(), 0, resultReceiver);
-            editText.clearFocus();
         }
 
         return isHide;
@@ -24,7 +23,6 @@ public class SoftKeyboardUtil {
         boolean isShow = false;
 
         if (imm != null) {
-            editText.requestFocus();
             isShow = imm.showSoftInput(editText, InputMethodManager.SHOW_FORCED, resultReceiver);
         }
 

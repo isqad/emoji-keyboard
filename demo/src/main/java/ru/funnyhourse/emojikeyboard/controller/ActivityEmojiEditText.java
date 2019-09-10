@@ -30,14 +30,11 @@ import ru.funnyhourse.emojikeyboard.model.Message;
 import ru.funnyhourse.emojikeyboard.model.MessageType;
 import ru.funnyhourse.emojikeyboard.util.TimestampUtil;
 import ru.funnyhourse.emojilibrary.view.EmojiEditTextPanel;
-import ru.funnyhourse.emojilibrary.view.IOnBackPressedListener;
 import ru.funnyhourse.emojilibrary.view.OnEmojiNavigationClickListener;
 
 public class ActivityEmojiEditText extends AppCompatActivity implements OnEmojiNavigationClickListener {
 
     public static final String TAG = "ActivityEmojiEditText";
-
-    private IOnBackPressedListener mOnBackPressedListener;
 
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
@@ -219,16 +216,11 @@ public class ActivityEmojiEditText extends AppCompatActivity implements OnEmojiN
 
     @Override
     public void onBackPressed() {
-        if (this.mOnBackPressedListener != null) {
-            if (!this.mOnBackPressedListener.onBackPressed()) {
-                super.onBackPressed();
-            }
+        Log.d("INN", "Act on back");
+        if (editTextPanel != null && editTextPanel.isKeyboardsVisible()) {
+            editTextPanel.hideKeyboards();
         } else {
             super.onBackPressed();
         }
-    }
-
-    public void setOnBackPressed(IOnBackPressedListener backListener) {
-        this.mOnBackPressedListener = backListener;
     }
 }
